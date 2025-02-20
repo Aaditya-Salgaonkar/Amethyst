@@ -3,6 +3,7 @@ import { useState } from "react";
 import { supabase } from "../client";
 import { Link } from "react-router-dom";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import { theme } from "../components/Theme";
 import {
   Box,
   Paper,
@@ -11,6 +12,7 @@ import {
   Button,
   Typography,
   Divider,
+  ThemeProvider,
 } from "@mui/material";
 import { motion } from "framer-motion";
 
@@ -49,135 +51,138 @@ const Signup = () => {
   }
 
   return (
-    <Box
-      sx={{
-        height: "100vh",
-        width: "100vw",
-        background:
-          "linear-gradient(135deg,rgb(240, 240, 240),rgb(255, 255, 255))",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <motion.div
-        initial={{ opacity: 0, y: -30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+    <ThemeProvider theme={theme}>
+      <Box
+        sx={{
+          height: "100vh",
+          width: "100vw",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
-        <Paper
-          elevation={12}
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            paddingLeft: 4,
-            paddingRight: 4,
-            paddingTop: 10,
-            paddingBottom: 10,
-            borderRadius: 4,
-            width: { xs: "90%", sm: "400px" },
-            backgroundColor: "white",
-          }}
+        <motion.div
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
         >
-          <Typography
-            component="h1"
-            variant="h4"
+          <Paper
+            elevation={24}
             sx={{
-              fontWeight: "700",
-              fontSize: "clamp(2rem, 10vw, 2.15rem)",
-              textAlign: "center",
-              color: "#1e3c72",
+              display: "flex",
+              flexDirection: "column",
+              paddingLeft: 6,
+              paddingRight: 6,
+              paddingTop: 11,
+              paddingBottom: 11,
+              borderRadius: 4,
+              width: { xs: "90%", sm: "400px", x12: "500px" },
             }}
           >
-            Sign up <PersonAddIcon sx={{ ml: 1 }} fontSize="large" />
-          </Typography>
-          <Divider sx={{ mb: 4, mt: 3 }} />
-          <form onSubmit={handleSubmit} style={{ width: "100%" }}>
-            <Stack spacing={3}>
-              <TextField
-                label="Full Name"
-                name="fullname"
-                onChange={handleChange}
-                value={formData.fullname}
-                fullWidth
-                variant="outlined"
-                required
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "12px",
-                  },
-                }}
-              />
-              <TextField
-                label="Email"
-                name="email"
-                onChange={handleChange}
-                value={formData.email}
-                fullWidth
-                variant="outlined"
-                required
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "12px",
-                  },
-                }}
-              />
-              <TextField
-                label="Password"
-                name="password"
-                type="password"
-                onChange={handleChange}
-                value={formData.password}
-                fullWidth
-                variant="outlined"
-                required
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "12px",
-                  },
-                }}
-              />
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button
-                  size="medium"
-                  sx={{
-                    borderRadius: "10px",
-                    backgroundColor: " #1e3c72",
-                    "&:hover": { backgroundColor: "#2a5298" },
-                  }}
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                >
-                  Sign up
-                </Button>
-              </motion.div>
-            </Stack>
-          </form>
-          <Typography
-            sx={{
-              mt: 4.5,
-              textAlign: "center",
-            }}
-          >
-            Already have an account?{" "}
-            <Link
-              to="/"
-              style={{
-                textDecoration: "none",
-                fontWeight: "bold",
-                color: "#1e3c72",
+            <Typography
+              component="h1"
+              variant="h4"
+              sx={{
+                textAlign: "center",
               }}
             >
-              Login
-            </Link>
-          </Typography>
-        </Paper>
-      </motion.div>
-    </Box>
+              Sign up <PersonAddIcon sx={{ ml: 1 }} fontSize="large" />
+            </Typography>
+            <Divider sx={{ mb: 4, mt: 3 }} />
+            <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+              <Stack spacing={3}>
+                <TextField
+                  label="Full Name"
+                  name="fullname"
+                  onChange={handleChange}
+                  value={formData.fullname}
+                  fullWidth
+                  variant="outlined"
+                  required
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "12px",
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "primary.main",
+                      },
+                    },
+                  }}
+                />
+                <TextField
+                  label="Email"
+                  name="email"
+                  onChange={handleChange}
+                  value={formData.email}
+                  fullWidth
+                  variant="outlined"
+                  required
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "12px",
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "primary.main",
+                      },
+                    },
+                  }}
+                />
+                <TextField
+                  label="Password"
+                  name="password"
+                  type="password"
+                  onChange={handleChange}
+                  value={formData.password}
+                  fullWidth
+                  variant="outlined"
+                  required
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "12px",
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "primary.main",
+                      },
+                    },
+                  }}
+                />
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button
+                    size="medium"
+                    sx={{
+                      borderRadius: "10px",
+                    }}
+                    type="submit"
+                    variant="contained"
+                    fullWidth
+                  >
+                    Sign up
+                  </Button>
+                </motion.div>
+              </Stack>
+            </form>
+            <Typography
+              sx={{
+                mt: 5,
+                textAlign: "center",
+              }}
+            >
+              Already have an account?{" "}
+              <Link
+                to="/"
+                style={{
+                  textDecoration: "none",
+                  fontWeight: "bold",
+                  color: theme.palette.secondary.main,
+                }}
+              >
+                Login
+              </Link>
+            </Typography>
+          </Paper>
+        </motion.div>
+      </Box>
+    </ThemeProvider>
   );
 };
 

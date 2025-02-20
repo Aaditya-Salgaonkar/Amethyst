@@ -18,7 +18,7 @@ const containerStyle = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  backgroundColor: " rgb(231, 243, 253)",
+  // backgroundColor: "background.container",
   height: "100vh",
   padding: "0px",
   position: "relative",
@@ -38,13 +38,12 @@ const paperStyle = {
   overflowY: "auto",
   width: "70%",
   height: "80%",
-  backgroundColor: "white",
   borderTopLeftRadius: "25px",
   borderBottomLeftRadius: "25px",
   borderBottomRightRadius: "17px",
   borderTopRightRadius: "17px",
   fontFamily: "sans-serif",
-  boxShadow: "0px 2px 22px rgba(61, 177, 254, 0.38)",
+  boxShadow: "0px 2px 22px rgba(254, 164, 61, 0.38)",
   animation: "scaleAnimation 2s infinite alternate ease-in-out",
   "@keyframes scaleAnimation": {
     "0%": {
@@ -61,15 +60,15 @@ const paperStyle = {
     width: "6px",
   },
   "&::-webkit-scrollbar-thumb": {
-    backgroundColor: "#3db1fe",
+    backgroundColor: "primary.main",
     borderRadius: "10px",
   },
   "&::-webkit-scrollbar-track": {
-    background: "#f1f1f1",
+    background: " #f1f1f1",
     borderRadius: "10px",
   },
   "&::-webkit-scrollbar-thumb:hover": {
-    backgroundColor: "#039be5",
+    backgroundColor: "secondary.main",
   },
 };
 
@@ -132,8 +131,6 @@ const ListRow = () => {
         height: "8%",
         width: "100%",
         borderTop: "1px solid rgb(211, 209, 209)",
-        color: "rgb(153, 156, 159)",
-        fontWeight: "500",
       }}
     >
       <Grid2
@@ -170,7 +167,6 @@ const ProjectHeader = ({ projName, budget, spent, remain }) => {
       sx={{
         height: "10%",
         width: "100%",
-        color: "#606060",
         fontWeight: "600",
         fontSize: "large",
         borderTop: "1px solid rgb(211, 209, 209)",
@@ -215,7 +211,6 @@ const ProjectItems = ({
       sx={{
         height: "9%",
         width: "100%",
-        color: " #646565",
         fontWeight: "500",
         fontSize: "medium",
         borderTop: "1px solid rgb(211, 209, 209)",
@@ -291,7 +286,7 @@ const ProjectItems = ({
             borderRadius: "2.5px",
             backgroundColor: "lightgrey",
             "& .MuiLinearProgress-bar": {
-              backgroundColor: "rgb(25, 163, 255)",
+              backgroundColor: "primary.main",
             },
           }}
           variant="determinate"
@@ -341,7 +336,7 @@ export default function Report({ projects = [] }) {
           sx={{
             height: "27%",
             width: "20%",
-            backgroundColor: " #85c3f0",
+            backgroundColor: "rgba(213, 118, 51, 0.82)",
             borderRadius: "20px",
             position: "absolute",
             top: "5.2%",
@@ -349,7 +344,7 @@ export default function Report({ projects = [] }) {
             zIndex: "1",
           }}
         ></Box>
-        <Paper sx={paperStyle} elevation={12}>
+        <Paper sx={paperStyle} elevation={18}>
           <TopRow />
           <ListRow />
           {projects.map((item, index) => (
@@ -366,7 +361,7 @@ export default function Report({ projects = [] }) {
           sx={{
             height: "27%",
             width: "20%",
-            backgroundColor: " #85c3f0",
+            backgroundColor: "rgba(213, 118, 51, 0.82)",
             borderRadius: "20px",
             position: "absolute",
             bottom: "5.2%",
