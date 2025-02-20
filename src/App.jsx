@@ -1,37 +1,49 @@
 import React, { useEffect, useState } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import SignUp from "./screens/signup";
 import Login from "./screens/login";
 import Home from "./screens/home";
-import { Routes, Route } from "react-router-dom";
 import Dashboard from './components/Dashboard';
-import Projects from './components/Projects'
+import Projects from './components/Projects';
 import Report from "./components/Report";
-const App = () => {
+import LandingPage from "./screens/LandingPage";
+
+function App() {
+  // Authentication state
   const [token, setToken] = useState(false);
-  if (token) {
-    sessionStorage.setItem("token", JSON.stringify(token));
-  }
+  const location = useLocation(); // Get the current route
+
+  // Load token from sessionStorage
   useEffect(() => {
-    if (sessionStorage.getItem("token")) {
-      let data = JSON.parse(sessionStorage.getItem("token"));
-      setToken(data);
+    const storedToken = sessionStorage.getItem("token");
+    if (storedToken) {
+      setToken(JSON.parse(storedToken));
     }
   }, []);
 
-  return (
-    <div>
-      <Routes>
-        <Route path={"/signup"} element={<SignUp />} />
-        <Route path={"/"} element={<Login setToken={setToken} />} />
-        {token ? <Route path={"/home"} element={<Home token={token} />} /> : ""}
-        {token ? <Route path={"/Dashboard"} element={<Dashboard />} /> : ""}
-        {token ? <Route path={"/Report"} element={<Report />} /> : ""}
-        {token ? <Route path={"/Projects"} element={<Projects />} /> : ""}
+  // Save token when it changes
+  useEffect(() => {
+    if (token) {
+      sessionStorage.setItem("token", JSON.stringify(token));
+    }
+  }, [token]);
 
-        
+  return (
+    <>
+      {/* Routes */}
+      <Routes>
+        <Route path="/" element={!token ? <LandingPage /> : <Navigate to="/home" />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<Login setToken={setToken} />} />
+
+        {/* Protected Routes */}
+        <Route path="/home" element={token ? <Home token={token} /> : <Navigate to="/login" />} />
+        <Route path="/dashboard" element={token ? <Dashboard /> : <Navigate to="/login" />} />
+        <Route path="/projects" element={token ? <Projects /> : <Navigate to="/login" />} />
+        <Route path="/report" element={token ? <Report /> : <Navigate to="/login" />} />
       </Routes>
-    </div>
+    </>
   );
-};
+}
 
 export default App;
