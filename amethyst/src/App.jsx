@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import SignUp from "./screens/signup";
+import Signup from "./screens/signup";
 import Login from "./screens/login";
 import Home from "./screens/home";
+import Report from "./screens/Report";
+import { demoObject } from "./Test/demoObject";
 import { Routes, Route } from "react-router-dom";
-import Dashboard from './components/Dashboard';
-import Projects from './components/Projects'
-import Report from "./components/Report";
+
 const App = () => {
   const [token, setToken] = useState(false);
   if (token) {
@@ -21,14 +21,15 @@ const App = () => {
   return (
     <div>
       <Routes>
-        <Route path={"/signup"} element={<SignUp />} />
+        <Route path={"/signup"} element={<Signup />} />
         <Route path={"/"} element={<Login setToken={setToken} />} />
         {token ? <Route path={"/home"} element={<Home token={token} />} /> : ""}
         {token ? <Route path={"/Dashboard"} element={<Dashboard />} /> : ""}
-        {token ? <Route path={"/Report"} element={<Report />} /> : ""}
-        {token ? <Route path={"/Projects"} element={<Projects />} /> : ""}
-
-        
+        {token ? (
+          <Route path={"/Report"} element={<Report projects={demoObject} />} />
+        ) : (
+          ""
+        )}
       </Routes>
     </div>
   );

@@ -6,10 +6,34 @@ import {
   Stack,
   Box,
   LinearProgress,
+  Container,
+  ThemeProvider,
 } from "@mui/material";
 import { FolderCopyRounded } from "@mui/icons-material";
+import { theme } from "../components/Theme";
 
 //These are the Style object for there respective components
+
+const containerStyle = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  backgroundColor: " rgb(231, 243, 253)",
+  height: "100vh",
+  padding: "0px",
+  position: "relative",
+  maxWidth: {
+    x15: "1530px",
+    x12: "1424px",
+    x10: "1170px",
+    x76: "910px",
+    x64: "655px",
+    x45: "530px",
+    x30: "380px",
+    x20: "100%",
+  },
+};
+
 const paperStyle = {
   overflowY: "auto",
   width: "70%",
@@ -311,44 +335,46 @@ const Project = ({
 
 export default function Report({ projects = [] }) {
   return (
-    <>
-      <Box
-        sx={{
-          height: "27%",
-          width: "20%",
-          backgroundColor: " #85c3f0",
-          borderRadius: "20px",
-          position: "absolute",
-          top: "5.2%",
-          left: "12%",
-          zIndex: "1",
-        }}
-      ></Box>
-      <Paper sx={paperStyle} elevation={12}>
-        <TopRow />
-        <ListRow />
-        {projects.map((item, index) => (
-          <Project
-            key={index}
-            name={item.projName}
-            budget={item.projBudget}
-            spent={item.projSpent}
-            projItems={item.projItems}
-          />
-        ))}
-      </Paper>
-      <Box
-        sx={{
-          height: "27%",
-          width: "20%",
-          backgroundColor: " #85c3f0",
-          borderRadius: "20px",
-          position: "absolute",
-          bottom: "5.2%",
-          right: "12%",
-          zIndex: "1",
-        }}
-      ></Box>
-    </>
+    <ThemeProvider theme={theme}>
+      <Container disableGutters sx={containerStyle}>
+        <Box
+          sx={{
+            height: "27%",
+            width: "20%",
+            backgroundColor: " #85c3f0",
+            borderRadius: "20px",
+            position: "absolute",
+            top: "5.2%",
+            left: "12%",
+            zIndex: "1",
+          }}
+        ></Box>
+        <Paper sx={paperStyle} elevation={12}>
+          <TopRow />
+          <ListRow />
+          {projects.map((item, index) => (
+            <Project
+              key={index}
+              name={item.projName}
+              budget={item.projBudget}
+              spent={item.projSpent}
+              projItems={item.projItems}
+            />
+          ))}
+        </Paper>
+        <Box
+          sx={{
+            height: "27%",
+            width: "20%",
+            backgroundColor: " #85c3f0",
+            borderRadius: "20px",
+            position: "absolute",
+            bottom: "5.2%",
+            right: "12%",
+            zIndex: "1",
+          }}
+        ></Box>
+      </Container>
+    </ThemeProvider>
   );
 }
