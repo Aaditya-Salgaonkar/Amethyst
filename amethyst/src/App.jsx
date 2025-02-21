@@ -8,6 +8,11 @@ import Projects from "./components/Projects";
 import Report from "./screens/Report";
 import LandingPage from "./screens/LandingPage";
 import { demoObject } from "./Test/demoObject";
+import ProjectCreate from "./screens/ProjectCreate";
+import ExpensesDashboard from "./screens/ExpensesDashboard";
+import AddExpense from "./screens/AddExpense";
+import UpdateProject from "./screens/UpdateProject";
+import Reminder from "./screens/reminder";
 
 const App = () => {
   const [token, setToken] = useState(false);
@@ -31,6 +36,8 @@ const App = () => {
           element={!token ? <LandingPage /> : <Navigate to="/home" />}
         />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/expenses" element={<ExpensesDashboard />} />
+        <Route path="/addexpense" element={<AddExpense />} />
         <Route path="/login" element={<Login setToken={setToken} />} />
         <Route
           path="/home"
@@ -49,6 +56,18 @@ const App = () => {
           element={
             token ? <Report projects={demoObject} /> : <Navigate to="/login" />
           }
+        />
+        <Route
+          path="/projectCreate"
+          element={token ? <ProjectCreate /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/projectUpdate"
+          element={token ? <UpdateProject /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/reminders"
+          element={token ? <Reminder /> : <Navigate to="/login" />}
         />
       </Routes>
     </div>

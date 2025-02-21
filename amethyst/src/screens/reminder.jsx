@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import React from "react";
 
-import { theme } from "./Theme";
+import { theme } from "../components/Theme";
 
 function calcDays(duedate) {
   const today = new Date();
@@ -74,7 +74,7 @@ const demoObj = [
   },
 ];
 
-export default function Dashboard() {
+export default function Reminder() {
   return (
     <ThemeProvider theme={theme}>
       <Box
