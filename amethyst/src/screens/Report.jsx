@@ -87,6 +87,7 @@ const commonProjectHeaderStyle = {
   justifyContent: "center",
   alignItems: "center",
   overflowX: "hidden",
+  borderRight: "1px solid rgb(211, 209, 209)",
 };
 
 const commonProjectItemsStyle = {
@@ -130,6 +131,7 @@ const ListRow = () => {
       sx={{
         height: "8%",
         width: "100%",
+        backgroundColor: "rgba(255, 143, 63, 0.62)",
         borderTop: "1px solid rgb(211, 209, 209)",
       }}
     >
@@ -142,25 +144,25 @@ const ListRow = () => {
           borderRight: "1px solid rgb(211, 209, 209)",
         }}
       >
-        {"Project Name"}
+        <b>{"Project Name"}</b>
       </Grid2>
       <Grid2 size={2} sx={commonListRowStyle}>
-        {"Budget"}
+        <b>{"Budget"}</b>
       </Grid2>
       <Grid2 size={2} sx={commonListRowStyle}>
-        {"Spent"}
+        <b>{"Spent"}</b>
       </Grid2>
       <Grid2 size={2} sx={commonListRowStyle}>
-        {" "}
+        <b>{"Remaining"}</b>
       </Grid2>
       <Grid2 size={2} sx={{ ...commonListRowStyle, borderRight: "none" }}>
-        {"Remain"}
+        <b>{"Due Date"}</b>
       </Grid2>
     </Grid2>
   );
 };
 
-const ProjectHeader = ({ projName, budget, spent, remain }) => {
+const ProjectHeader = ({ projName, budget, spent, remain, duedate }) => {
   return (
     <Grid2
       container
@@ -169,7 +171,6 @@ const ProjectHeader = ({ projName, budget, spent, remain }) => {
         width: "100%",
         fontWeight: "600",
         fontSize: "large",
-        borderTop: "1px solid rgb(211, 209, 209)",
       }}
     >
       <Grid2
@@ -189,22 +190,16 @@ const ProjectHeader = ({ projName, budget, spent, remain }) => {
         {spent}
       </Grid2>
       <Grid2 size={2} sx={commonProjectHeaderStyle}>
-        {" "}
+        {remain}
       </Grid2>
       <Grid2 size={2} sx={commonProjectHeaderStyle}>
-        {remain}
+        {duedate}
       </Grid2>
     </Grid2>
   );
 };
 
-const ProjectItems = ({
-  budget,
-  spent,
-  itemName = "Dummy",
-  iconColor,
-  progress,
-}) => {
+const ProjectItems = ({ itemName = "Dummy" }) => {
   return (
     <Grid2
       container
@@ -220,20 +215,20 @@ const ProjectItems = ({
       }}
     >
       <Grid2
-        size={4}
+        size={12}
         sx={{
           ...commonProjectItemsStyle,
-          paddingLeft: "4.5%",
+          paddingLeft: "6%",
           justifyContent: "flex-start",
-          borderRight: "1px solid rgb(211, 209, 209)",
+          borderRight: "none",
         }}
       >
-        <Stack direction={"row"} spacing={1.5}>
+        <Stack direction={"row"} spacing={2}>
           <Box
             sx={{
               width: "40px",
               height: "40px",
-              backgroundColor: iconColor,
+              backgroundColor: "rgba(255, 143, 63, 0.79)",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
@@ -252,50 +247,6 @@ const ProjectItems = ({
           </Typography>
         </Stack>
       </Grid2>
-      <Grid2
-        size={2}
-        sx={{
-          ...commonProjectItemsStyle,
-          borderRight: "1px solid rgb(211, 209, 209)",
-        }}
-      >
-        {`${budget} hr`}
-      </Grid2>
-      <Grid2
-        size={2}
-        sx={{
-          ...commonProjectItemsStyle,
-          borderRight: "1px solid rgb(211, 209, 209)",
-        }}
-      >
-        {`${spent} hr`}
-      </Grid2>
-      <Grid2
-        size={2}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          borderRight: "1px solid rgb(211, 209, 209)",
-        }}
-      >
-        <LinearProgress
-          sx={{
-            width: "90%",
-            height: "7px",
-            borderRadius: "2.5px",
-            backgroundColor: "lightgrey",
-            "& .MuiLinearProgress-bar": {
-              backgroundColor: "primary.main",
-            },
-          }}
-          variant="determinate"
-          value={progress}
-        />
-      </Grid2>
-      <Grid2 size={2} sx={commonProjectItemsStyle}>
-        {`${budget - spent} hr`}
-      </Grid2>
     </Grid2>
   );
 };
@@ -305,24 +256,27 @@ const Project = ({
   name = "Spuk Inc",
   budget = 111,
   spent = 0,
+  duedate = "12/12/2022",
 }) => {
   return (
     <>
+      <Box
+        sx={{
+          width: "100%",
+          height: "2%",
+          backgroundColor: "rgba(255, 143, 63, 0.44)",
+        }}
+      />
+
       <ProjectHeader
         projName={name}
         budget={budget}
         spent={spent}
         remain={budget - spent}
+        duedate={duedate}
       />
       {projItems.map((item, index) => (
-        <ProjectItems
-          itemName={item.itemName}
-          key={index}
-          budget={item.budget}
-          spent={item.spent}
-          iconColor={item.iconColor}
-          progress={item.progress}
-        />
+        <ProjectItems itemName={item.itemName} key={index} />
       ))}
     </>
   );
@@ -332,6 +286,23 @@ export default function Report({ projects = [] }) {
   return (
     <ThemeProvider theme={theme}>
       <Container disableGutters sx={containerStyle}>
+        <button
+          style={{
+            height: "5%",
+            width: "5%",
+            backgroundColor: "rgba(213, 118, 51, 0.82)",
+            borderRadius: "40px",
+            position: "absolute",
+            top: "4%",
+            left: "2%",
+            fontWeight: "bold",
+            fontSize: "1.8rem",
+            zIndex: "1",
+          }}
+          onClick={() => window.history.back()}
+        >
+          &larr;
+        </button>
         <Box
           sx={{
             height: "27%",

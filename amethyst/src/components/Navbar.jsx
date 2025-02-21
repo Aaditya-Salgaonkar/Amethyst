@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import logo from "../assets/logo.png";
 import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
@@ -21,15 +22,15 @@ const Navbar = () => {
             <a href="">Contact</a>
           </ul>
           <div className="hidden lg:flex justify-center space-x-12 items-center">
-            <a href="login" className="px-3 py-2 border rounded-md">
+            <Link to="/login" className="px-3 py-2 border rounded-md">
               Log in
-            </a>
-            <a
-              href="signup"
+            </Link>
+            <Link
+              to="/signup"
               className="bg-gradient-to-r from-orange-500 to-orange-800 px-3 py-2 border rounded-md"
             >
               Create an Account
-            </a>
+            </Link>
           </div>
           <div className="lg:hidden md:flex flex-col justify-end">
             <button onClick={toggleNavBar}>

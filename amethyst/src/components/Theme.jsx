@@ -27,7 +27,7 @@ export const theme = createTheme({
     primary: { main: "#f97316" },
     secondary: { main: "#c2410c" },
     background: {
-      default: " #262626",
+      default: "#262626",
       paper: "rgb(25, 25, 25)",
       container: "rgb(29, 29, 29)",
     },
@@ -45,6 +45,16 @@ export const theme = createTheme({
           color: "#ffffff",
           "&:hover": {
             background: "linear-gradient(to right, #c2410c, #f97316)",
+          },
+        },
+        outlined: {
+          background: "transparent",
+          border: "2px solid #f97316",
+          color: "#f97316",
+          "&:hover": {
+            background: "transparent",
+            borderColor: " #c2410c",
+            color: " #c2410c",
           },
         },
       },
