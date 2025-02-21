@@ -8,6 +8,8 @@ import Projects from "./components/Projects";
 import Report from "./screens/Report";
 import LandingPage from "./screens/LandingPage";
 import { demoObject } from "./Test/demoObject";
+import ExpensesDashboard from "./screens/ExpensesDashboard";
+import AddExpense from "./screens/AddExpense";
 
 const App = () => {
   const [token, setToken] = useState(false);
@@ -26,11 +28,14 @@ const App = () => {
   return (
     <div>
       <Routes>
+        {/*  some links from sidebar and expense dashboard have not been assigned routes */ }
         <Route
           path="/"
           element={!token ? <LandingPage /> : <Navigate to="/home" />}
         />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/expenses" element={<ExpensesDashboard />} />
+        <Route path="/addexpense" element={<AddExpense />} />
         <Route path="/login" element={<Login setToken={setToken} />} />
         <Route
           path="/home"
