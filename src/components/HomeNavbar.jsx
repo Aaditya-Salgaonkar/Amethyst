@@ -18,10 +18,10 @@ const btnStyle = {
   },
 };
 
-export default function HomeNavbar() {
+export default function HomeNavbar({freelancerName}) {
   const navigate = useNavigate();
   function handleLogout() {
-    sessionStorage.removeItem("token");
+    localStorage.removeItem("authToken");
     navigate("/");
   }
 
@@ -34,7 +34,7 @@ export default function HomeNavbar() {
         <Box sx={{ display: "flex", gap: 4 }}>
           <Button
             component={Link}
-            // to="/Dashboard"
+           to="/home"
             variant="contained"
             sx={btnStyle}
           >
@@ -48,22 +48,22 @@ export default function HomeNavbar() {
           >
             Report
           </Button>
-          <Button
+          {/* <Button
             component={Link}
             to="/projectCreate"
             variant="contained"
             sx={btnStyle}
           >
             Create Project
-          </Button>
-          <Button
+          </Button> */}
+          {/* <Button
             component={Link}
             to="/projectUpdate"
             variant="contained"
             sx={btnStyle}
           >
             Update Project
-          </Button>
+          </Button> */}
           <Button
             component={Link}
             to="/reminders"
@@ -80,14 +80,14 @@ export default function HomeNavbar() {
           >
             Expenses
           </Button>
-          <Button
+          {/* <Button
             component={Link}
             to="/addexpense"
             variant="contained"
             sx={btnStyle}
           >
             Add Expenses
-          </Button>
+          </Button> */}
           <Button
             component={Link}
             to="/payments"
@@ -97,7 +97,11 @@ export default function HomeNavbar() {
             Payments
           </Button>
         </Box>
+
         <Box sx={{ flexGrow: 1 }} />
+        <Typography variant="body1" sx={{ color: "white", mr: 2 }}>
+          {freelancerName ? `Hello, ${freelancerName}` : "Hello, Freelancer"}
+        </Typography>
         <Button
           sx={{ ...btnStyle, color: "#f97316" }}
           variant="contained"

@@ -19,7 +19,7 @@ export default function ProjectCreate({token}) {
         }}
       >
 
-        <ProjectForm createOupdate="Create" />
+        <ProjectForm createOupdate="Create" token={token} />
       </Box>
     </ThemeProvider>
    </div>

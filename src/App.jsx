@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import SignUp from "./screens/signup";
 import Login from "./screens/login";
-import Home from "./screens/home";
-import Dashboard from "./components/Dashboard";
+import Home from "./screens/Dashboard";
+
 import Projects from "./components/Projects";
 import Report from "./screens/Report";
 import LandingPage from "./screens/LandingPage";
@@ -44,10 +44,10 @@ const App = () => {
           path="/home"
           element={token ? <Home token={token} /> : <Navigate to="/login" />}
         />
-        <Route
+        {/* <Route
           path="/dashboard"
           element={token ? <Dashboard oken={token} /> : <Navigate to="/login" />}
-        />
+        /> */}
         <Route
           path="/projects"
           element={token ? <Projects /> : <Navigate to="/login" />}

@@ -1,4 +1,4 @@
-import React, { forwardRef, useState, useImperativeHandle } from "react";
+import React, { forwardRef, useState,useEffect, useImperativeHandle } from "react";
 import {
   Paper,
   Box,
@@ -53,6 +53,22 @@ const ProjectForm = forwardRef((props, ref) => {
       setFormData(newData);
     },
   }));
+  const [freelancerId, setFreelancerId] = useState(null);
+
+  // Fetch the current user's ID from Supabase Auth
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (user) {
+        setFreelancerId(user.id);
+      } else {
+        console.error("User not logged in:", error);
+      }
+    };
+
+    fetchUserId();
+  }, []);
+
 
   const handleChange = (e, index = null) => {
     const { name, value } = e.target;
@@ -70,12 +86,12 @@ const ProjectForm = forwardRef((props, ref) => {
     const { data, error } = await supabase.from("projects").insert([
       {
         name: formData.projectName,
-        clientName:formData.clientName,
         start_date: formData.startDate,
-        end_date: formData.endDate,
+        due_date: formData.endDate,
         budget_allocated: formData.totalBudget,
         paymentDate: formData.paymentDate,
         payment_status: formData.paymentStatus,
+        freelancerId: freelancerId,
         
       },
     ]);

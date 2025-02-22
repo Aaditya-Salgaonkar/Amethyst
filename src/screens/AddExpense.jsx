@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-
+import { supabase } from "../client";
+import { useNavigate } from "react-router-dom";
 const AddExpense = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     amount: "",
@@ -13,11 +15,41 @@ const AddExpense = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert("Form has been submitted");
-    console.log("Expense Submitted:", formData);
-  };
+
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const { title, amount, date, category } = formData;
+
+  if (!title || !amount || !date || !category) {
+    alert("Please fill in all fields");
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("expenses") // Table name
+    .insert([
+      {
+        expense_title: title,
+        amount: parseFloat(amount),
+        date: date,
+        category: category,
+        created_at: new Date().toISOString(), // Automatically set timestamp
+      },
+    ]);
+
+  if (error) {
+    console.error("Error inserting expense:", error);
+    alert("Failed to add expense");
+  } else {
+    alert("Expense added successfully!");
+    console.log("Expense inserted:", data);
+    setFormData({ title: "", amount: "", date: "", category: "" }); // Reset form
+    navigate(-1)
+  }
+};
+
 
   return (
     <div className="h-screen w-screen flex justify-center items-center">
@@ -25,7 +57,7 @@ const AddExpense = () => {
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="bg-white p-10 rounded-lg shadow-lg shadow-orange-500 bg-opacity-5 h-[80%] w-[60%] rounded-[25px] flex justify-center items-center"
+        className="bg-white p-10 rounded-lg shadow-lg shadow-orange-500 bg-opacity-5 h-[80%] w-[60%]  flex justify-center items-center"
       >
         <div className="h-[100%] w-[90%]">
           <h2 className="mt-8 mb-8 ml-4 text-2xl bg-gradient-to-r from-orange-500 to-red-800 font-semibold text-transparent bg-clip-text">
