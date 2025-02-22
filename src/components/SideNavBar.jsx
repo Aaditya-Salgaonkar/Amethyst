@@ -28,7 +28,7 @@ const SideNavBar = () => {
             </Link>
           </div>
           <div>
-            <Link to="/view-expenses">
+            <Link to="/viewexpenses">
               <h1 className="text-xl bg-gradient-to-r from-orange-500 to-red-800 text-transparent bg-clip-text cursor-pointer hover:text-white">
                 VIEW EXPENSES
               </h1>
@@ -36,7 +36,7 @@ const SideNavBar = () => {
           </div>
           <div>
             <h1 className="text-xl bg-gradient-to-r from-orange-500 to-red-800 text-transparent bg-clip-text hover:text-white">
-              HELLO USER
+              ABOUT US
             </h1>
           </div>
 

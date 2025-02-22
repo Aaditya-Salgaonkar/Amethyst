@@ -10,6 +10,7 @@ import LandingPage from "./screens/LandingPage";
 import { demoObject } from "./Test/demoObject";
 import ExpensesDashboard from "./screens/ExpensesDashboard";
 import AddExpense from "./screens/AddExpense";
+import ViewExpenses from "./screens/ViewExpenses";
 
 const App = () => {
   const [token, setToken] = useState(false);
@@ -36,6 +37,7 @@ const App = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/expenses" element={<ExpensesDashboard />} />
         <Route path="/addexpense" element={<AddExpense />} />
+        <Route path="/viewexpenses" element={<ViewExpenses />} />
         <Route path="/login" element={<Login setToken={setToken} />} />
         <Route
           path="/home"
