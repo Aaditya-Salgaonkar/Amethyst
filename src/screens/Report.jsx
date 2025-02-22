@@ -5,7 +5,7 @@ import {
   Grid2,
   Stack,
   Box,
-  LinearProgress,
+  Button,
   Container,
   ThemeProvider,
 } from "@mui/material";
@@ -286,23 +286,20 @@ export default function Report({ projects = [] }) {
   return (
     <ThemeProvider theme={theme}>
       <Container disableGutters sx={containerStyle}>
-        <button
+        <Button
           style={{
-            height: "5%",
-            width: "5%",
-            backgroundColor: "rgba(213, 118, 51, 0.82)",
-            borderRadius: "40px",
+            height: "4%",
+            width: "4%",
+            borderRadius: "10px",
             position: "absolute",
             top: "4%",
             left: "2%",
-            fontWeight: "bold",
-            fontSize: "1.8rem",
             zIndex: "1",
           }}
           onClick={() => window.history.back()}
         >
-          &larr;
-        </button>
+          BACK
+        </Button>
         <Box
           sx={{
             height: "27%",

@@ -13,6 +13,7 @@ export const theme = createTheme({
       x20: 290,
     },
   },
+
   typography: {
     fontFamily: "Poppins, sans-serif",
     fontSize: 16,

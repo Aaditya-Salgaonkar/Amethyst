@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import SideNavBar from "../components/SideNavBar";
 import { motion } from "framer-motion";
 
 const AddExpense = () => {
   const [formData, setFormData] = useState({
     title: "",
     amount: "",
-    date:" ",
+    date: "",
     category: "",
   });
 
@@ -16,21 +15,22 @@ const AddExpense = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("Form has been submitted")
+    alert("Form has been submitted");
     console.log("Expense Submitted:", formData);
   };
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar (fixed width) */}
-      <div className="w-80 h-screen">
-        <SideNavBar />
-      </div>
-
-      {/* Main Content (Form) */}
-      <div className="flex-1 w-full h-full flex items-center justify-center p-20">
-        <div className="bg-white p-10 rounded-lg shadow-lg shadow-orange-500 bg-opacity-5 w-full h-96">
-          <h2 className="text-xl bg-gradient-to-r from-orange-500 to-red-800 font-semibold mb-4 bg text-transparent bg-clip-text">Add Expense</h2>
+    <div className="h-screen w-screen flex justify-center items-center">
+      <motion.div
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="bg-white p-10 rounded-lg shadow-lg shadow-orange-500 bg-opacity-5 h-[80%] w-[60%] rounded-[25px] flex justify-center items-center"
+      >
+        <div className="h-[100%] w-[90%]">
+          <h2 className="mt-8 mb-8 ml-4 text-2xl bg-gradient-to-r from-orange-500 to-red-800 font-semibold text-transparent bg-clip-text">
+            Add Expense
+          </h2>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <input
               type="text"
@@ -38,7 +38,7 @@ const AddExpense = () => {
               value={formData.title}
               onChange={handleChange}
               placeholder="Expense Title"
-              className="p-2 border rounded-xl hover:border-green-400"
+              className="pl-5 border rounded-2xl hover:border-orange-400 h-14"
             />
             <input
               type="number"
@@ -46,7 +46,7 @@ const AddExpense = () => {
               value={formData.amount}
               onChange={handleChange}
               placeholder="Amount"
-              className="p-2 border rounded-xl hover:border-green-400"
+              className="pl-5 border rounded-2xl hover:border-orange-400 h-14"
             />
             <input
               type="date"
@@ -54,17 +54,17 @@ const AddExpense = () => {
               value={formData.date}
               onChange={handleChange}
               placeholder="Date of Expense"
-              className="p-2 border rounded-xl hover:border-green-400"
+              className="pl-5 border rounded-2xl hover:border-orange-400 h-14"
             />
-
-            {/* Dropdown for selecting category */}
             <select
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="p-2 border rounded-xl hover:border-green-400"
+              className="pl-5 border rounded-2xl hover:border-orange-400 h-14"
             >
-              <option value="" disabled>Select Category</option>
+              <option value="" disabled>
+                Select Category
+              </option>
               <option value="Subscriptions">Subscriptions</option>
               <option value="Licencses">Licenses</option>
               <option value="AI">AI tools</option>
@@ -74,15 +74,15 @@ const AddExpense = () => {
             </select>
             <motion.button
               type="submit"
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.95 }}
-              className="p-2 bg-orange-500 text-white rounded"
+              className="p-2 font-bold bg-orange-500 text-white rounded-xl"
             >
               Submit
             </motion.button>
           </form>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
