@@ -13,6 +13,7 @@ import { FolderCopyRounded } from "@mui/icons-material";
 import { theme } from "../components/Theme";
 import { useState, useEffect } from "react";
 import { supabase } from "../client";
+import Spinner from "../components/Spinner";
 //These are the Style object for there respective components
 
 const containerStyle = {
@@ -327,13 +328,15 @@ const Project = ({
 
 export default function Report({ uuid }) {
 
+  const [loading, setLoading] = useState(false) 
   const [projects, setProjects] = useState([])
 
   const loadProjects = async () => {
     if (uuid) {
+      setLoading(true)
       const fetchedProjects = await fetchProjectsWithClientData(uuid);
       setProjects(fetchedProjects);
-      console.log(fetchedProjects)
+      setLoading(false)
     }
   };
 
@@ -371,10 +374,11 @@ export default function Report({ uuid }) {
             zIndex: "1",
           }}
         ></Box>
+      
         <Paper sx={paperStyle} elevation={18}>
           <TopRow />
           <ListRow />
-          {projects.map((item, index) => (
+          {loading ? <Spinner/> : projects.map((item, index) => (
             <Project
               key={index}
               name={item.projectName}
@@ -383,7 +387,9 @@ export default function Report({ uuid }) {
               projItems={item.subtasks}
             />
           ))}
+        
         </Paper>
+        
         <Box
           sx={{
             height: "27%",
