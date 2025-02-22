@@ -10,7 +10,8 @@ import {
   Stack,
 } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
-
+import { useNavigate } from "react-router-dom";
+import { supabase } from "../client";
 const commonGridItemStyles = {
   display: "flex",
   flexDirection: "column",
@@ -30,11 +31,13 @@ const commonInputStyles = {
 };
 
 const ProjectForm = forwardRef((props, ref) => {
+  const navigate=useNavigate();
   const {
     width = "70%",
     createOupdate = "nothing",
     handleOnsubmit = () => {},
   } = props;
+  
   const [formData, setFormData] = useState({
     projectName: "",
     startDate: "",
@@ -61,7 +64,29 @@ const ProjectForm = forwardRef((props, ref) => {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
+    const { data, error } = await supabase.from("projects").insert([
+      {
+        name: formData.projectName,
+        clientName:formData.clientName,
+        start_date: formData.startDate,
+        end_date: formData.endDate,
+        budget_allocated: formData.totalBudget,
+        paymentDate: formData.paymentDate,
+        payment_status: formData.paymentStatus,
+        
+      },
+    ]);
+
+    if (error) {
+      console.error("Error inserting project:", error.message);
+    } else {
+      console.log("Project inserted successfully:", data);
+      navigate('/home')
+    }
+  };
   const addSubtask = () => {
     setFormData((prev) => ({ ...prev, subtasks: [...prev.subtasks, ""] }));
   };
@@ -416,7 +441,7 @@ const ProjectForm = forwardRef((props, ref) => {
         <Button
           sx={{ ml: 4, mr: 10 }}
           variant="contained"
-          onClick={handleOnsubmit}
+          onClick={handleSubmit}
         >
           {createOupdate}
         </Button>

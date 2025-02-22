@@ -34,7 +34,7 @@ export default function HomeNavbar() {
         <Box sx={{ display: "flex", gap: 4 }}>
           <Button
             component={Link}
-            to="/Dashboard"
+            // to="/Dashboard"
             variant="contained"
             sx={btnStyle}
           >

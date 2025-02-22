@@ -1,97 +1,98 @@
-import React, { useState } from "react";
-import { Container, Grid, Paper, Typography, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton } from "@mui/material";
-import { Add, Delete, Edit } from "@mui/icons-material";
-import SideNavBar from "../components/SideNavBar"; // Assuming you have a Sidebar
-import { theme } from "../components/Theme";
-import { ThemeProvider,Box } from "@mui/material";
-const initialPayments = [
-  { id: 1, title: "Electricity Bill", amount: 120, date: "2024-02-15", category: "Utilities" },
-  { id: 2, title: "Netflix Subscription", amount: 15, date: "2024-02-10", category: "Entertainment" },
-  { id: 3, title: "Gym Membership", amount: 50, date: "2024-02-05", category: "Health" },
-];
+import { useEffect, useState } from "react";
+import { supabase } from "../client";
+import {
+    Container,
+    Typography,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper,
+    CircularProgress,
+    Alert,
+} from "@mui/material";
+import HomeNavbar from "../components/HomeNavbar";
+const Payments = ({token}) => {
+    const [transactions, setTransactions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-const Payments = () => {
-  const [payments, setPayments] = useState(initialPayments);
-  const [searchQuery, setSearchQuery] = useState("");
+    useEffect(() => {
+        fetchTransactions();
+    }, []);
 
-  const handleDelete = (id) => {
-    setPayments(payments.filter(payment => payment.id !== id));
-  };
+    const fetchTransactions = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const { data, error } = await supabase
+                .from("transactions")
+                .select("id, invoice_id, amount_paid, payment_method, transaction_date, expense_title")
+                .order("transaction_date", { ascending: false });
 
-  const handleSearch = (event) => {
-    setSearchQuery(event.target.value);
-  };
+            if (error) throw error;
+            setTransactions(data);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const filteredPayments = payments.filter(payment => 
-    payment.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    payment.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    return (
+        <div>
+            <HomeNavbar token={token} />
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+            
+            <Typography variant="h4" fontWeight="bold" sx={{ mb: 3 }}>
+                Payments & Transactions
+            </Typography>
 
-  return (
-    <ThemeProvider theme={theme}>
-      <Box
-        sx={{
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Grid container spacing={2} sx={{ backgroundColor: theme.palette.background.default, minHeight: "100vh" }}>
-      
-     
-      <Grid item xs={10}>
-        <Container>
-          <Typography variant="h4" sx={{ marginTop: 3, fontWeight: "bold" }}>Payments</Typography>
+            {loading && (
+                <div style={{ textAlign: "center" }}>
+                    <CircularProgress />
+                </div>
+            )}
 
-          <TextField
-            label="Search Payments"
-            variant="outlined"
-            fullWidth
-            sx={{ my: 2 }}
-            value={searchQuery}
-            onChange={handleSearch}
-          />
+            {error && <Alert severity="error">{error}</Alert>}
 
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell><strong>Title</strong></TableCell>
-                  <TableCell><strong>Amount ($)</strong></TableCell>
-                  <TableCell><strong>Date</strong></TableCell>
-                  <TableCell><strong>Category</strong></TableCell>
-                  <TableCell><strong>Actions</strong></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredPayments.map((payment) => (
-                  <TableRow key={payment.id}>
-                    <TableCell>{payment.title}</TableCell>
-                    <TableCell>${payment.amount}</TableCell>
-                    <TableCell>{payment.date}</TableCell>
-                    <TableCell>{payment.category}</TableCell>
-                    <TableCell>
-                      <IconButton color="primary"><Edit /></IconButton>
-                      <IconButton color="error" onClick={() => handleDelete(payment.id)}><Delete /></IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+            {!loading && transactions.length === 0 && (
+                <Typography variant="body1" color="textSecondary">
+                    No transactions found.
+                </Typography>
+            )}
 
-          <Button variant="contained" color="primary" startIcon={<Add />} sx={{ mt: 3 }}>
-            Add Payment
-          </Button>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><b>Transaction ID</b></TableCell>
+                            <TableCell><b>Invoice ID</b></TableCell>
+                            <TableCell><b>Amount Paid</b></TableCell>
+                            <TableCell><b>Payment Method</b></TableCell>
+                            <TableCell><b>Date</b></TableCell>
+                            <TableCell><b>Expense Title</b></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {transactions.map((txn) => (
+                            <TableRow key={txn.id}>
+                                <TableCell>{txn.id}</TableCell>
+                                <TableCell>{txn.invoice_id}</TableCell>
+                                <TableCell>${txn.amount_paid}</TableCell>
+                                <TableCell>{txn.payment_method}</TableCell>
+                                <TableCell>{new Date(txn.transaction_date).toLocaleDateString()}</TableCell>
+                                <TableCell>{txn.expense_title}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </Container>
-      </Grid>
-    </Grid>
-      </Box>
-    </ThemeProvider>
-    
-  );
+        </div>
+    );
 };
 
 export default Payments;

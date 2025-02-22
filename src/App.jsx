@@ -38,7 +38,7 @@ const App = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/expenses" element={<ExpensesDashboard />} />
         <Route path="/addexpense" element={<AddExpense />} />
-        <Route path="/payments" element={<Payments />} />
+        <Route path="/payments" element={<Payments token={token} />} />
         <Route path="/login" element={<Login setToken={setToken} />} />
         <Route
           path="/home"
@@ -46,7 +46,7 @@ const App = () => {
         />
         <Route
           path="/dashboard"
-          element={token ? <Dashboard /> : <Navigate to="/login" />}
+          element={token ? <Dashboard oken={token} /> : <Navigate to="/login" />}
         />
         <Route
           path="/projects"
@@ -60,7 +60,7 @@ const App = () => {
         />
         <Route
           path="/projectCreate"
-          element={token ? <ProjectCreate /> : <Navigate to="/login" />}
+          element={token ? <ProjectCreate token={token} /> : <Navigate to="/login" />}
         />
         <Route
           path="/projectUpdate"
