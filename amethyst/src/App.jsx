@@ -54,7 +54,7 @@ const App = () => {
         <Route
           path="/report"
           element={
-            token ? <Report projects={demoObject} /> : <Navigate to="/login" />
+            token ? <Report uuid={token?.user?.id} /> : <Navigate to="/login" />
           }
         />
         <Route

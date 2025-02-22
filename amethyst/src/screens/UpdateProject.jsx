@@ -277,6 +277,7 @@ export default function UpdateProject({uuid}) {
     totalBudget: "",
     paymentDate: "",
     clientName: "",
+    status: false,
     paymentStatus: false,
     subtasks: [""],
   });
@@ -302,6 +303,7 @@ export default function UpdateProject({uuid}) {
         budget_allocated: project.totalBudget ? parseFloat(project.totalBudget) : null,
         "paymentDate": project.paymentDate || null,
         payment_status: !!project.paymentStatus,
+        status: !!project.status,
         subtasks: JSON.stringify(project.subtasks.map((task) => ({ name: task, status: 0 }))),
       };
   
@@ -323,6 +325,7 @@ export default function UpdateProject({uuid}) {
           paymentDate: "",
           clientName: "",
           paymentStatus: false,
+          status: false,
           subtasks: [""],
         })
         loadProjects();
@@ -525,23 +528,42 @@ export default function UpdateProject({uuid}) {
                               ...commonGridItemStyles,
                             }}
                           >
+                            
+
+
                             <Typography
                               variant="subtitle1"
                               sx={{ fontSize: "1rem", ml: 1, mb: 1 }}
                             >
-                              Client Name
+                              Payment Status
                             </Typography>
-                            <TextField
+                            <FormControl
                               fullWidth
-                              name="clientName"
-                              value={project.clientName}
-                              placeholder={project.clientName}
-                              onChange={handleChange}
-                              required
-                              sx={{
-                                ...commonInputStyles,
-                              }}
-                            />
+                              sx={{ ...commonInputStyles }}
+                            >
+                              <Select
+                                name="paymentStatus"
+                                value={project.paymentStatus}
+                                onChange={(e) =>
+                                  setProject((prev) => ({
+                                    ...prev,
+                                    paymentStatus: e.target.value,
+                                  }))
+                                }
+                                required
+                              >
+                                <MenuItem value={true}>True</MenuItem>
+                                <MenuItem value={false}>False</MenuItem>
+                              </Select>
+                            </FormControl>
+
+
+
+
+
+
+
+
                           </Grid2>
 
                           <Grid2
@@ -663,19 +685,19 @@ export default function UpdateProject({uuid}) {
                               variant="subtitle1"
                               sx={{ fontSize: "1rem", ml: 1, mb: 1 }}
                             >
-                              Payment Status
+                              Project Status
                             </Typography>
                             <FormControl
                               fullWidth
                               sx={{ ...commonInputStyles }}
                             >
                               <Select
-                                name="paymentStatus"
-                                value={project.paymentStatus}
+                                name="status"
+                                value={project.status}
                                 onChange={(e) =>
                                   setProject((prev) => ({
                                     ...prev,
-                                    paymentStatus: e.target.value,
+                                    status: e.target.value,
                                   }))
                                 }
                                 required

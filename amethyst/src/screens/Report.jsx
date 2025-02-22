@@ -11,7 +11,8 @@ import {
 } from "@mui/material";
 import { FolderCopyRounded } from "@mui/icons-material";
 import { theme } from "../components/Theme";
-
+import { useState, useEffect } from "react";
+import { supabase } from "../client";
 //These are the Style object for there respective components
 
 const containerStyle = {
@@ -251,6 +252,48 @@ const ProjectItems = ({ itemName = "Dummy" }) => {
   );
 };
 
+
+
+
+
+
+const fetchProjectsWithClientData = async (freelancerId) => {
+  try {
+    const { data: projects, error: projectError } = await supabase
+      .from("projects")
+      .select(
+        " name, due_date, budget_allocated, subtasks"
+      )
+      .eq("freelancerId", freelancerId);
+
+    if (projectError) {
+      console.error("Error fetching projects:", projectError.message);
+      return [];
+    }
+
+    const projectsWithClientData = await Promise.all(
+      projects.map(async (project) => {
+
+        return {
+          projectName: project.name,
+          endDate: project.due_date,
+          totalBudget: project.budget_allocated?.toString() || "0",
+          subtasks: project.subtasks ? JSON.parse(project.subtasks).map((task) => task.name) : [],
+        };
+      })
+    );
+
+    return projectsWithClientData;
+  } catch (error) {
+    console.error("Unexpected error:", error.message);
+    return [];
+  }
+};
+
+
+
+
+
 const Project = ({
   projItems = [],
   name = "Spuk Inc",
@@ -276,13 +319,29 @@ const Project = ({
         duedate={duedate}
       />
       {projItems.map((item, index) => (
-        <ProjectItems itemName={item.itemName} key={index} />
+        <ProjectItems itemName={item} key={index} />
       ))}
     </>
   );
 };
 
-export default function Report({ projects = [] }) {
+export default function Report({ uuid }) {
+
+  const [projects, setProjects] = useState([])
+
+  const loadProjects = async () => {
+    if (uuid) {
+      const fetchedProjects = await fetchProjectsWithClientData(uuid);
+      setProjects(fetchedProjects);
+      console.log(fetchedProjects)
+    }
+  };
+
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
+
   return (
     <ThemeProvider theme={theme}>
       <Container disableGutters sx={containerStyle}>
@@ -318,10 +377,10 @@ export default function Report({ projects = [] }) {
           {projects.map((item, index) => (
             <Project
               key={index}
-              name={item.projName}
-              budget={item.projBudget}
-              spent={item.projSpent}
-              projItems={item.projItems}
+              name={item.projectName}
+              duedate={item.endDate}
+              budget={item.totalBudget}
+              projItems={item.subtasks}
             />
           ))}
         </Paper>

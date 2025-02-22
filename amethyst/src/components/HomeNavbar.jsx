@@ -3,8 +3,9 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { Link } from "react-router-dom";
-import { Button, Box } from "@mui/material";
+import { Button, Box, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import Logo from "../assets/logo.png"
 
 const btnStyle = {
   borderRadius: 0,
@@ -31,9 +32,16 @@ export default function HomeNavbar({ token }) {
   return (
     <AppBar position="static" sx={{ backgroundColor: "rgb(15, 15, 15)" }}>
       <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 0.15 }}>
-          WorkSphere
+        <Stack direction={"row"} spacing={1} sx={{  height: '100%', width: '15%' }}>
+        <img style={{
+            height: '50%',
+            width: '16%',
+          }} src={Logo} alt="no image"/>
+          <Typography variant="h6">
+          <b>WorkSphere</b>
         </Typography>
+        </Stack>
+        
         <Box sx={{ display: "flex", gap: 4 }}>
           <Button
             component={Link}
