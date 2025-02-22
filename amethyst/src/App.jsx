@@ -65,7 +65,7 @@ const App = () => {
         />
         <Route
           path="/projectUpdate"
-          element={token ? <UpdateProject /> : <Navigate to="/login" />}
+          element={token ? <UpdateProject uuid={token?.user?.id} /> : <Navigate to="/login" />}
         />
         <Route
           path="/reminders"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Select, MenuItem, FormControl } from "@mui/material";
 import {
   Paper,
@@ -19,6 +19,8 @@ import {
   commonGridItemStyles,
   commonInputStyles,
 } from "../components/ProjectForm";
+import { supabase } from "../client";
+
 
 const containerStyle = {
   display: "flex",
@@ -39,96 +41,155 @@ const containerStyle = {
   },
 };
 
-const demoObject = [
-  {
-    projectId: "",
-    projectName: "E-commerce Website",
-    startDate: "2023-06-15",
-    endDate: "2023-12-20",
-    totalBudget: "50000",
-    paymentDate: "2023-12-25",
-    clientName: "ABC Retail Ltd.",
-    paymentStatus: true,
-    subtasks: ["Design", "Development", "Testing"],
-  },
-  {
-    projectId: "",
-    projectName: "Mobile Banking App",
-    startDate: "2023-07-01",
-    endDate: "2024-02-10",
-    totalBudget: "75000",
-    paymentDate: "2024-02-15",
-    clientName: "XYZ Bank",
-    paymentStatus: true,
-    subtasks: ["Backend Setup", "UI/UX", "Security Testing"],
-  },
-  {
-    projectId: "",
-    projectName: "Healthcare Portal",
-    startDate: "2023-08-10",
-    endDate: "2024-03-05",
-    totalBudget: "60000",
-    paymentDate: "2024-03-10",
-    clientName: "MediCare Solutions",
-    paymentStatus: true,
-    subtasks: ["Database Design", "API Integration", "User Testing"],
-  },
-  {
-    projectId: "",
-    projectName: "AI Chatbot Integration",
-    startDate: "2023-09-05",
-    endDate: "2024-04-01",
-    totalBudget: "45000",
-    paymentDate: "2024-04-05",
-    clientName: "Tech Innovators Inc.",
-    paymentStatus: true,
-    subtasks: ["NLP Model", "Backend Integration", "Deployment"],
-  },
-  {
-    projectId: "",
-    projectName: "Inventory Management System",
-    startDate: "2023-10-12",
-    endDate: "2024-05-15",
-    totalBudget: "55000",
-    paymentDate: "2024-05-20",
-    clientName: "Global Logistics",
-    paymentStatus: true,
-    subtasks: ["Requirement Analysis", "Prototype", "Final Testing"],
-  },
-  {
-    projectId: "",
-    projectName: "Online Learning Platform",
-    startDate: "2023-11-20",
-    endDate: "2024-06-30",
-    totalBudget: "70000",
-    paymentDate: "2024-07-05",
-    clientName: "EduTech Academy",
-    paymentStatus: true,
-    subtasks: ["Video Streaming", "Quiz System", "Progress Tracking"],
-  },
-  {
-    projectId: "",
-    projectName: "CRM Software Development",
-    startDate: "2023-12-01",
-    endDate: "2024-08-10",
-    totalBudget: "65000",
-    paymentDate: "2024-08-15",
-    clientName: "NextGen Enterprises",
-    paymentStatus: true,
-    subtasks: ["Lead Management", "Automation", "Reports Dashboard"],
-  },
-  {
-    projectId: "",
-    projectName: "Hotel Booking System",
-    startDate: "2024-01-15",
-    endDate: "2024-09-20",
-    totalBudget: "80000",
-    paymentDate: "2024-09-25",
-    clientName: "Luxury Stays",
-    paymentStatus: true,
-    subtasks: ["Room Availability", "Payment Gateway", "User Reviews"],
-  },
-];
+
+
+const fetchProjectsWithClientData = async (freelancerId) => {
+  try {
+    const { data: projects, error: projectError } = await supabase
+      .from("projects")
+      .select(
+        "p_id, name, start_date, status, due_date, budget_allocated, paymentDate, payment_status, subtasks, client_id"
+      )
+      .eq("freelancerId", freelancerId);
+
+    if (projectError) {
+      console.error("Error fetching projects:", projectError.message);
+      return [];
+    }
+
+    const projectsWithClientData = await Promise.all(
+      projects.map(async (project) => {
+        let clientName = "";
+
+        if (project.client_id) {
+          const { data: client, error: clientError } = await supabase
+            .from("clients")
+            .select("name")
+            .eq("id", project.client_id)
+            .single();
+
+          if (clientError) {
+            console.error(
+              `Error fetching client for project ${project.p_id}:`,
+              clientError.message
+            );
+          } else {
+            clientName = client.name;
+          }
+        }
+
+        return {
+          projectId: project.p_id,
+          projectName: project.name,
+          startDate: project.start_date,
+          endDate: project.due_date,
+          totalBudget: project.budget_allocated?.toString() || "0",
+          paymentDate: project.paymentDate,
+          clientName: clientName || "Unknown",
+          paymentStatus: project.payment_status,
+          status: project.status,
+          subtasks: project.subtasks ? JSON.parse(project.subtasks).map((task) => task.name) : [],
+        };
+      })
+    );
+
+    return projectsWithClientData;
+  } catch (error) {
+    console.error("Unexpected error:", error.message);
+    return [];
+  }
+};
+
+// const demoObject = [
+//   {
+//     projectId: "",
+//     projectName: "E-commerce Website",
+//     startDate: "2023-06-15",
+//     endDate: "2023-12-20",
+//     totalBudget: "50000",
+//     paymentDate: "2023-12-25",
+//     clientName: "ABC Retail Ltd.",
+//     paymentStatus: true,
+//     subtasks: ["Design", "Development", "Testing"],
+//   },
+//   {
+//     projectId: "",
+//     projectName: "Mobile Banking App",
+//     startDate: "2023-07-01",
+//     endDate: "2024-02-10",
+//     totalBudget: "75000",
+//     paymentDate: "2024-02-15",
+//     clientName: "XYZ Bank",
+//     paymentStatus: true,
+//     subtasks: ["Backend Setup", "UI/UX", "Security Testing"],
+//   },
+//   {
+//     projectId: "",
+//     projectName: "Healthcare Portal",
+//     startDate: "2023-08-10",
+//     endDate: "2024-03-05",
+//     totalBudget: "60000",
+//     paymentDate: "2024-03-10",
+//     clientName: "MediCare Solutions",
+//     paymentStatus: true,
+//     subtasks: ["Database Design", "API Integration", "User Testing"],
+//   },
+//   {
+//     projectId: "",
+//     projectName: "AI Chatbot Integration",
+//     startDate: "2023-09-05",
+//     endDate: "2024-04-01",
+//     totalBudget: "45000",
+//     paymentDate: "2024-04-05",
+//     clientName: "Tech Innovators Inc.",
+//     paymentStatus: true,
+//     subtasks: ["NLP Model", "Backend Integration", "Deployment"],
+//   },
+//   {
+//     projectId: "",
+//     projectName: "Inventory Management System",
+//     startDate: "2023-10-12",
+//     endDate: "2024-05-15",
+//     totalBudget: "55000",
+//     paymentDate: "2024-05-20",
+//     clientName: "Global Logistics",
+//     paymentStatus: true,
+//     subtasks: ["Requirement Analysis", "Prototype", "Final Testing"],
+//   },
+//   {
+//     projectId: "",
+//     projectName: "Online Learning Platform",
+//     startDate: "2023-11-20",
+//     endDate: "2024-06-30",
+//     totalBudget: "70000",
+//     paymentDate: "2024-07-05",
+//     clientName: "EduTech Academy",
+//     paymentStatus: true,
+//     subtasks: ["Video Streaming", "Quiz System", "Progress Tracking"],
+//   },
+//   {
+//     projectId: "",
+//     projectName: "CRM Software Development",
+//     startDate: "2023-12-01",
+//     endDate: "2024-08-10",
+//     totalBudget: "65000",
+//     paymentDate: "2024-08-15",
+//     clientName: "NextGen Enterprises",
+//     paymentStatus: true,
+//     subtasks: ["Lead Management", "Automation", "Reports Dashboard"],
+//   },
+//   {
+//     projectId: "",
+//     projectName: "Hotel Booking System",
+//     startDate: "2024-01-15",
+//     endDate: "2024-09-20",
+//     totalBudget: "80000",
+//     paymentDate: "2024-09-25",
+//     clientName: "Luxury Stays",
+//     paymentStatus: true,
+//     subtasks: ["Room Availability", "Payment Gateway", "User Reviews"],
+//   },
+// ];
 
 const CustomCard = ({ project, change }) => {
   return (
@@ -205,7 +266,9 @@ const CustomCard = ({ project, change }) => {
   );
 };
 
-export default function UpdateProject() {
+export default function UpdateProject({uuid}) {
+
+  const [projects, setProjects] = useState([])
   const [project, setProject] = useState({
     projectId: "",
     projectName: "",
@@ -218,20 +281,58 @@ export default function UpdateProject() {
     subtasks: [""],
   });
 
-  const updateProject = async () => {
-    try {
-      await fetch(`/api/projects/${project.projectId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(project),
-      });
-      alert("Project updated successfully!");
-    } catch (error) {
-      console.error("Failed to update project:", error);
+  const loadProjects = async () => {
+    if (uuid) {
+      const fetchedProjects = await fetchProjectsWithClientData(uuid);
+      setProjects(fetchedProjects);
     }
   };
+
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
+
+  const handleUpdateProject = async () => {
+    try {
+      const updatedProjectPayload = {
+        name: project.projectName,
+        start_date: project.startDate || null,
+        due_date: project.endDate || null,
+        budget_allocated: project.totalBudget ? parseFloat(project.totalBudget) : null,
+        "paymentDate": project.paymentDate || null,
+        payment_status: !!project.paymentStatus,
+        subtasks: JSON.stringify(project.subtasks.map((task) => ({ name: task, status: 0 }))),
+      };
+  
+      const { error } = await supabase
+        .from("projects")
+        .update(updatedProjectPayload)
+        .eq("p_id", project.projectId);
+  
+      if (error) {
+        alert("Error updating project: " + error.message);
+      } else {
+        alert("Project updated successfully!");
+        setProject({
+          projectId: "",
+          projectName: "",
+          startDate: "",
+          endDate: "",
+          totalBudget: "",
+          paymentDate: "",
+          clientName: "",
+          paymentStatus: false,
+          subtasks: [""],
+        })
+        loadProjects();
+      }
+    } catch (error) {
+      alert("Unexpected error: " + error.message);
+    }
+  };
+  
+
 
   const handleChange = (e, index = null) => {
     const { name, value } = e.target;
@@ -292,7 +393,7 @@ export default function UpdateProject() {
                 },
               }}
             >
-              {demoObject.map((project, index) => (
+              {projects.map((project, index) => (
                 <CustomCard
                   key={index}
                   project={project}
@@ -719,7 +820,7 @@ export default function UpdateProject() {
                     <Button
                       sx={{ ml: 4, mr: 10 }}
                       variant="contained"
-                      onClick={() => {}}
+                      onClick={handleUpdateProject}
                     >
                       Update
                     </Button>

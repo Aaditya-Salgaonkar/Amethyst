@@ -21,10 +21,11 @@ const btnStyle = {
 export default function HomeNavbar({ token }) {
   const navigate = useNavigate();
   function handleLogout() {
-    localStorage.removeItem("authToken"); // Remove auth token
-    localStorage.removeItem("freelancerId"); // Remove freelancer ID
-    sessionStorage.clear(); // Clear session storage (if used)
-    navigate("/");
+    localStorage.removeItem("authToken"); 
+    localStorage.removeItem("freelancerId"); 
+    sessionStorage.clear(); 
+    console.log("Logged Out")
+    navigate("/login");
   }
 
   return (

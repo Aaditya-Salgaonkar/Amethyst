@@ -10,6 +10,7 @@ import {
   Stack,
 } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
+import { supabase } from "../client";
 
 export const commonGridItemStyles = {
   display: "flex",
@@ -38,6 +39,7 @@ const ProjectForm = ({ uuid }) => {
     paymentDate: "",
     clientName: "",
     paymentStatus: false,
+    clientEmail: '',
     subtasks: [""],
   });
 
@@ -59,6 +61,100 @@ const ProjectForm = ({ uuid }) => {
   const removeSubtask = (index) => {
     const updatedSubtasks = formData.subtasks.filter((_, i) => i !== index);
     setFormData((prev) => ({ ...prev, subtasks: updatedSubtasks }));
+  };
+
+  const handleCreateProject = async () => {
+    try {
+      console.log("Creating project...");
+
+      let clientId = null;
+
+      if (formData.clientName) {
+
+        const { data: existingClient, error: clientError } = await supabase
+          .from("clients")
+          .select("id")
+          .eq("name", formData.clientName)
+          .single();
+
+        if (clientError && clientError.code !== "PGRST116") {
+          console.error("Error fetching client:", clientError.message);
+          return;
+        }
+
+        if (existingClient) {
+          clientId = existingClient.id;
+        } else {
+
+          const { data: newClient, error: newClientError } = await supabase
+            .from("clients")
+            .insert([
+              { name: formData.clientName, email: formData.clientEmail || "" },
+            ])
+            .select("id")
+            .single();
+
+          if (newClientError) {
+            console.error("Error creating client:", newClientError.message);
+            return;
+          }
+
+          clientId = newClient.id;
+          console.log("New client created with ID:", clientId);
+        }
+      }
+
+      // Format subtasks (initialize all with status 0)
+      const formattedSubtasks = formData.subtasks
+        .filter((task) => task.trim() !== "") // Remove empty tasks
+        .map((task) => ({
+          name: task,
+          status: 0,
+        }));
+
+      console.log("Formatted subtasks:", formattedSubtasks);
+
+      // Prepare project payload
+      const projectPayload = {
+        name: formData.projectName,
+        start_date: formData.startDate || null, // Directly use the date (assuming correct format)
+        due_date: formData.endDate || null,
+        budget_allocated: formData.totalBudget
+          ? parseFloat(formData.totalBudget)
+          : null, // Cast budget to number
+        "paymentDate": formData.paymentDate || null,
+        payment_status: !!formData.paymentStatus, // Cast to boolean
+        subtasks: JSON.stringify(formattedSubtasks), // Convert subtasks to JSON string
+        client_id: clientId,
+        "freelancerId": uuid || null, // Use freelancerId directly
+        status: false, // Initial status is false
+      };
+
+      const { data: projectData, error: projectError } = await supabase
+        .from("projects")
+        .insert([projectPayload])
+        .select();
+
+      if (projectError) {
+        console.error("Error creating project:", projectError.message);
+      } else {
+        console.log("Project created successfully!", projectData);
+        alert("Project created successfully!");
+        setFormData({
+          projectName: "",
+          startDate: "",
+          endDate: "",
+          totalBudget: "",
+          paymentDate: "",
+          clientName: "",
+          clientEmail: '',
+          paymentStatus: false,
+          subtasks: [""],
+        })
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error.message);
+    }
   };
 
   return (
@@ -288,6 +384,33 @@ const ProjectForm = ({ uuid }) => {
                   }}
                 />
               </Grid2>
+
+              <Grid2
+                item
+                size={6}
+                sx={{
+                  ...commonGridItemStyles,
+                }}
+              >
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontSize: "1rem", ml: 1, mb: 1 }}
+                >
+                  Client Email
+                </Typography>
+                <TextField
+                  fullWidth
+                  name="clientEmail"
+                  value={formData.clientEmail}
+                  placeholder={formData.clientEmail}
+                  onChange={handleChange}
+                  required
+                  sx={{
+                    ...commonInputStyles,
+                  }}
+                />
+              </Grid2>
+
             </Grid2>
           </Box>
         </Grid2>
@@ -408,7 +531,11 @@ const ProjectForm = ({ uuid }) => {
         >
           Cancel
         </Button>
-        <Button sx={{ ml: 4, mr: 10 }} variant="contained" onClick={() => {}}>
+        <Button
+          sx={{ ml: 4, mr: 10 }}
+          variant="contained"
+          onClick={handleCreateProject}
+        >
           Create
         </Button>
       </Stack>
@@ -417,24 +544,3 @@ const ProjectForm = ({ uuid }) => {
 };
 
 export default ProjectForm;
-
-// const handleCreateProject = async () => {
-//   const { error } = await supabase.from("projects").insert([
-//     {
-//       project_name: formData.projectName,
-//       start_date: formData.startDate,
-//       end_date: formData.endDate,
-//       total_budget: formData.totalBudget,
-//       payment_date: formData.paymentDate,
-//       client_name: formData.clientName,
-//       payment_status: formData.paymentStatus,
-//       subtasks: formData.subtasks,
-//     },
-//   ]);
-
-//   if (error) {
-//     console.error("Error creating project:", error.message);
-//   } else {
-//     alert("Project created successfully!");
-//   }
-// };
