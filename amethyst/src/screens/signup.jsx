@@ -4,6 +4,7 @@ import { supabase } from "../client";
 import { Link } from "react-router-dom";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { theme } from "../components/Theme";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Paper,
@@ -17,6 +18,8 @@ import {
 import { motion } from "framer-motion";
 
 const Signup = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     fullname: "",
     email: "",
@@ -34,7 +37,7 @@ const Signup = () => {
   async function handleSubmit(event) {
     event.preventDefault();
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -43,8 +46,32 @@ const Signup = () => {
           },
         },
       });
+
       if (error) throw error;
+
+      const { user } = data;
+
+      if (user) {
+        const { data: freelancer, error: freelancerError } = await supabase
+          .from("freelancer")
+          .upsert(
+            {
+              id: user.id,
+              email: user.email,
+              name: formData.fullname || "",
+            },
+            { onConflict: ["email"] }
+          )
+          .select("id")
+          .single();
+
+        if (freelancerError) throw freelancerError;
+
+        console.log("Freelancer ID:", freelancer.id);
+      }
+
       alert("Check your email for a verification link!");
+      navigate("/login");
     } catch (error) {
       alert(error.message);
     }

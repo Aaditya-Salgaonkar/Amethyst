@@ -1,4 +1,4 @@
-import React, { forwardRef, useState, useImperativeHandle } from "react";
+import React, { useState } from "react";
 import {
   Paper,
   Box,
@@ -11,13 +11,13 @@ import {
 } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 
-const commonGridItemStyles = {
+export const commonGridItemStyles = {
   display: "flex",
   flexDirection: "column",
   padding: 3,
 };
 
-const commonInputStyles = {
+export const commonInputStyles = {
   "& .MuiOutlinedInput-root": {
     borderRadius: "12px",
     "& .MuiOutlinedInput-notchedOutline": {
@@ -29,12 +29,7 @@ const commonInputStyles = {
   },
 };
 
-const ProjectForm = forwardRef((props, ref) => {
-  const {
-    width = "70%",
-    createOupdate = "nothing",
-    handleOnsubmit = () => {},
-  } = props;
+const ProjectForm = ({ uuid }) => {
   const [formData, setFormData] = useState({
     projectName: "",
     startDate: "",
@@ -42,14 +37,9 @@ const ProjectForm = forwardRef((props, ref) => {
     totalBudget: "",
     paymentDate: "",
     clientName: "",
+    paymentStatus: false,
     subtasks: [""],
   });
-
-  useImperativeHandle(ref, () => ({
-    updateFormData(newData) {
-      setFormData(newData);
-    },
-  }));
 
   const handleChange = (e, index = null) => {
     const { name, value } = e.target;
@@ -89,7 +79,7 @@ const ProjectForm = forwardRef((props, ref) => {
           x20: "95%",
         },
         width: {
-          x10: width,
+          x10: "70%",
           x76: "70%",
           x64: "80%",
           x45: "90%",
@@ -115,7 +105,7 @@ const ProjectForm = forwardRef((props, ref) => {
         }}
         variant="h5"
       >
-        {createOupdate} Project
+        Create Project
       </Typography>
 
       <Grid2 container sx={{ width: "100%", height: "80%" }}>
@@ -132,7 +122,12 @@ const ProjectForm = forwardRef((props, ref) => {
             x20: 12,
           }}
         >
-          <Box sx={{ width: "100%", height: "80%" }}>
+          <Box
+            sx={{
+              width: "100%",
+              height: "80%",
+            }}
+          >
             <Grid2 container sx={{ height: "100%", width: "100%" }}>
               <Grid2
                 item
@@ -413,16 +408,33 @@ const ProjectForm = forwardRef((props, ref) => {
         >
           Cancel
         </Button>
-        <Button
-          sx={{ ml: 4, mr: 10 }}
-          variant="contained"
-          onClick={handleOnsubmit}
-        >
-          {createOupdate}
+        <Button sx={{ ml: 4, mr: 10 }} variant="contained" onClick={() => {}}>
+          Create
         </Button>
       </Stack>
     </Paper>
   );
-});
+};
 
 export default ProjectForm;
+
+// const handleCreateProject = async () => {
+//   const { error } = await supabase.from("projects").insert([
+//     {
+//       project_name: formData.projectName,
+//       start_date: formData.startDate,
+//       end_date: formData.endDate,
+//       total_budget: formData.totalBudget,
+//       payment_date: formData.paymentDate,
+//       client_name: formData.clientName,
+//       payment_status: formData.paymentStatus,
+//       subtasks: formData.subtasks,
+//     },
+//   ]);
+
+//   if (error) {
+//     console.error("Error creating project:", error.message);
+//   } else {
+//     alert("Project created successfully!");
+//   }
+// };

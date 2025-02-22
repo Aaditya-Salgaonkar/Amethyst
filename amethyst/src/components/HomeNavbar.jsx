@@ -18,10 +18,12 @@ const btnStyle = {
   },
 };
 
-export default function HomeNavbar() {
+export default function HomeNavbar({ token }) {
   const navigate = useNavigate();
   function handleLogout() {
-    sessionStorage.removeItem("token");
+    localStorage.removeItem("authToken"); // Remove auth token
+    localStorage.removeItem("freelancerId"); // Remove freelancer ID
+    sessionStorage.clear(); // Clear session storage (if used)
     navigate("/");
   }
 
@@ -91,7 +93,12 @@ export default function HomeNavbar() {
         </Box>
         <Box sx={{ flexGrow: 1 }} />
         <Button
-          sx={{ ...btnStyle, color: "#f97316" }}
+          sx={{
+            ...btnStyle,
+            color: "#f97316",
+            border: "3px solid #f97316",
+            borderRadius: "20px",
+          }}
           variant="contained"
           onClick={handleLogout}
         >

@@ -59,7 +59,9 @@ const App = () => {
         />
         <Route
           path="/projectCreate"
-          element={token ? <ProjectCreate /> : <Navigate to="/login" />}
+          element={
+            token ? <ProjectCreate token={token} /> : <Navigate to="/login" />
+          }
         />
         <Route
           path="/projectUpdate"

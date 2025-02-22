@@ -15,6 +15,7 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 
 const Login = ({ setToken }) => {
   const navigate = useNavigate();
@@ -22,6 +23,14 @@ const Login = ({ setToken }) => {
     email: "",
     password: "",
   });
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("authToken");
+    if (storedToken) {
+      setToken(JSON.parse(storedToken));
+      navigate("/home");
+    }
+  }, []);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -41,7 +50,9 @@ const Login = ({ setToken }) => {
       });
 
       if (error) throw error;
+
       setToken(data);
+      localStorage.setItem("authToken", JSON.stringify(data)); // Store token in localStorage
       navigate("/home");
     } catch (error) {
       alert(error.message);

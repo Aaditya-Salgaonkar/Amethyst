@@ -2,7 +2,7 @@ import React from "react";
 import { Box, ThemeProvider } from "@mui/material";
 import { theme } from "../components/Theme";
 import ProjectForm from "../components/ProjectForm";
-export default function ProjectCreate() {
+export default function ProjectCreate({ token }) {
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -14,7 +14,7 @@ export default function ProjectCreate() {
           alignItems: "center",
         }}
       >
-        <ProjectForm createOupdate="Create" />
+        <ProjectForm uuid={token?.user?.id} createOupdate="Create" />
       </Box>
     </ThemeProvider>
   );
