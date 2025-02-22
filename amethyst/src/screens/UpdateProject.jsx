@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Select, MenuItem, FormControl } from "@mui/material";
+import Spinner from "../components/Spinner";
 import {
   Paper,
   TextField,
@@ -268,6 +269,7 @@ const CustomCard = ({ project, change }) => {
 
 export default function UpdateProject({uuid}) {
 
+  const [loading, setLoading] = useState(false)
   const [projects, setProjects] = useState([])
   const [project, setProject] = useState({
     projectId: "",
@@ -284,8 +286,10 @@ export default function UpdateProject({uuid}) {
 
   const loadProjects = async () => {
     if (uuid) {
+      setLoading(true)
       const fetchedProjects = await fetchProjectsWithClientData(uuid);
       setProjects(fetchedProjects);
+      setLoading(false)
     }
   };
 
@@ -396,7 +400,7 @@ export default function UpdateProject({uuid}) {
                 },
               }}
             >
-              {projects.map((project, index) => (
+              {loading ? <Spinner/> : projects.map((project, index) => (
                 <CustomCard
                   key={index}
                   project={project}
@@ -702,8 +706,8 @@ export default function UpdateProject({uuid}) {
                                 }
                                 required
                               >
-                                <MenuItem value={true}>True</MenuItem>
-                                <MenuItem value={false}>False</MenuItem>
+                                <MenuItem value={true}>Completed</MenuItem>
+                                <MenuItem value={false}>Pending</MenuItem>
                               </Select>
                             </FormControl>
                           </Grid2>

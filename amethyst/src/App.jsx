@@ -69,7 +69,7 @@ const App = () => {
         />
         <Route
           path="/reminders"
-          element={token ? <Reminder /> : <Navigate to="/login" />}
+          element={token ? <Reminder uuid={token?.user?.id} /> : <Navigate to="/login" />}
         />
       </Routes>
     </div>

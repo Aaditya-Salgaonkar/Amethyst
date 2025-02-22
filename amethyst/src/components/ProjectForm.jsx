@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import { supabase } from "../client";
+import Spinner from "./Spinner";
 
 export const commonGridItemStyles = {
   display: "flex",
@@ -31,6 +32,7 @@ export const commonInputStyles = {
 };
 
 const ProjectForm = ({ uuid }) => {
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     projectName: "",
     startDate: "",
@@ -64,6 +66,7 @@ const ProjectForm = ({ uuid }) => {
   };
 
   const handleCreateProject = async () => {
+    setLoading(true)
     try {
       console.log("Creating project...");
 
@@ -155,10 +158,12 @@ const ProjectForm = ({ uuid }) => {
     } catch (error) {
       console.error("Unexpected error:", error.message);
     }
+    setLoading(false)
   };
 
   return (
-    <Paper
+
+   loading ? <Spinner top="1%"/> : <Paper
       elevation={18}
       sx={{
         position: "absolute",
