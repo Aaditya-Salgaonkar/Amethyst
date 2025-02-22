@@ -2,6 +2,7 @@ import React from "react";
 import SideNavBar from "../components/SideNavBar";
 import { Add, Pageview, Payments } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import CategoryWiseExpenses from "../components/CategoryWiseExpenses";
 
 const ExpensesDashboard = () => {
   return (
@@ -16,13 +17,13 @@ const ExpensesDashboard = () => {
         <div className="flex p-10 w-full h-full flex-col items-center justify-center gap-4">
           
           {/* Placeholder for Graph */}
-          <div className="bg-white p-5 text-center w-full h-full border-white bg-opacity-5 rounded-3xl text-2xl"> THIS WILL CONTAIN A GRAPH OR SOME OTHER WIDGET</div>
+          <div className="bg-white p-5 text-center w-full h-auto border-white bg-opacity-5 rounded-3xl text-2xl"><CategoryWiseExpenses></CategoryWiseExpenses></div>
 
           {/* Navigation Boxes */}
           <div className="p-5 bg-white w-full bg-opacity-5 h-full gap-4 rounded-3xl flex flex-row justify-between items-center">
             
             {/* Add Expense */}
-            <Link to="/addexpenses" className="h-full w-1/3">
+            <Link to="/addexpense" className="h-full w-1/3">
               <div className="bg-white bg-opacity-5 w-full h-full rounded-3xl flex justify-center gap-4 items-center text-xl cursor-pointer hover:bg-green-200 transition-all p-4  hover:text-green-500">
                 <Add sx={{ color: "green", fontSize: 40 }} />
                 <h3 className="text-center">Add an Expense</h3>

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import SideNavBar from "../components/SideNavBar";
 import { motion } from "framer-motion";
+import { supabase } from "../client";
 
 const AddExpense = () => {
   const [formData, setFormData] = useState({
@@ -12,20 +13,67 @@ const AddExpense = () => {
     projectId: ""
   });
 
-  const projects = [
-    { id: "P123", name: "Website Development" },
-    { id: "P456", name: "Mobile App Design" },
-    { id: "P789", name: "Marketing Campaign" }
-  ];
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) {
+        console.error("Error fetching user:", authError);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("projects")
+        .select("p_id, name")
+        .eq("freelancerId", user.id);
+
+      if (error) {
+        console.error("Error fetching projects:", error);
+      } else {
+        setProjects(data);
+      }
+    };
+
+    fetchProjects();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Form has been submitted");
-    console.log("Expense Submitted:", formData);
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError) {
+      console.error("Error fetching user:", authError);
+      return;
+    }
+
+    const { error } = await supabase.from("expenses").insert([
+      {
+        expense_title: formData.title,
+        amount: formData.amount,
+        date: formData.date,
+        category: formData.category,
+        freelancer_id: user.id,
+        project_id: formData.projectId
+      }
+    ]);
+
+    if (error) {
+      console.error("Error submitting expense:", error);
+    } else {
+      alert("Expense added successfully!");
+      setFormData({
+        title: "",
+        amount: "",
+        date: "",
+        category: "",
+        clientName: "",
+        projectId: ""
+      });
+    }
   };
 
   return (
@@ -93,7 +141,7 @@ const AddExpense = () => {
             >
               <option value="" disabled>Select Project</option>
               {projects.map((project) => (
-                <option key={project.id} value={project.id}>{project.name}</option>
+                <option key={project.p_id} value={project.p_id}>{project.name}</option>
               ))}
             </select>
 

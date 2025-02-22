@@ -1,48 +1,34 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SideNavBar from '../components/SideNavBar'
+import { supabase } from '../client'
+
 
 const ViewExpenses = () => {
 {/*This has ben hardcoded now but can be fetched from supabase */}
   
-  const [expenses,setExpenses]= useState([
-    {
-      id:1,
-      expense_title:"Office Supplies",
-      date:"2025-02-20",
-      amount:1500,
-      category:"Stationery",
-      client_name:"ABC Corp",
-      project_id:"P123"
+  const [expenses,setExpenses]= useState([])
+  useEffect( ()=>{
+    const fetchExpenses= async()=>{
+      const {data :{user},error : authError} =await supabase.auth.getUser()
+      if(authError){
+        console.error("Error fetching user:", authError);
+        return;
+      }
+      const{data,error}=await supabase.from("expenses").
+      select("id, expense_title, date, amount, category, project_id, projects(name)")
+      .eq("freelancer_id", user.id)
+      
+      if (error) {
+        console.error("Error fetching expenses:", error);
+      } 
+      else{
+        setExpenses(data)
+      }
+    };
+    fetchExpenses();
+  }
 
-    },
-    {
-      id: 2,
-      expense_title: "Software Subscription",
-      date: "2025-02-18",
-      amount: 2500,
-      category:"Subscription",
-      client_name: "XYZ Ltd",
-      project_id: "P456"
-    },
-    {
-      id: 3,
-      expense_title: "Team Lunch",
-      date: "2025-02-15",
-      amount: 3000,
-      category:"License",
-      client_name: "LMN Pvt Ltd",
-      project_id: "P789"
-    },
-    {
-      id: 4,
-      expense_title: "Documentation",
-      date: "2025-02-15",
-      amount: 3000,
-      category:"Stationery",
-      client_name: "L and T Pvt Ltd",
-      project_id: "P789"
-    }
-  ])
+  ,[]);
   return (
     <>
     <div className=" flex  h-screen">
@@ -61,8 +47,8 @@ const ViewExpenses = () => {
                   <h3 className="text-2xl font-semibold">{expense.expense_title}</h3>
                   <p className="text-gray-500 text-xl">{new Date(expense.date).toLocaleDateString()}</p>
                   <p className='text-gray-500 text-base'>{expense.category}</p>
-                  <p className="text-sm text-gray-700">Client: {expense.client_name}</p>
-                  <p className="text-sm text-gray-700">Project ID: {expense.project_id}</p>
+                  <p className="text-sm text-gray-700">Project: {expense.projects?.name || "N/A"}</p>
+
                
                   <div className="text-lg font-bold text-green-600">₹{expense.amount}</div>
                  
