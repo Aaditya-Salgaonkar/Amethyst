@@ -14,7 +14,7 @@ export default function ProjectCreate({ token }) {
           alignItems: "center",
         }}
       >
-        <ProjectForm uuid={token?.user?.id} createOupdate="Create" />
+        <ProjectForm uuid={token?.user?.id}/>
       </Box>
     </ThemeProvider>
   );

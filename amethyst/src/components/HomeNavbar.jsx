@@ -19,7 +19,7 @@ const btnStyle = {
   },
 };
 
-export default function HomeNavbar({ token }) {
+export default function HomeNavbar({ freelancerName }) {
   const navigate = useNavigate();
   function handleLogout() {
     localStorage.removeItem("authToken"); 
@@ -59,7 +59,7 @@ export default function HomeNavbar({ token }) {
           >
             Report
           </Button>
-          <Button
+          {/* <Button
             component={Link}
             to="/projectCreate"
             variant="contained"
@@ -74,7 +74,7 @@ export default function HomeNavbar({ token }) {
             sx={btnStyle}
           >
             Update Project
-          </Button>
+          </Button> */}
           <Button
             component={Link}
             to="/reminders"
@@ -91,16 +91,27 @@ export default function HomeNavbar({ token }) {
           >
             Expenses
           </Button>
-          <Button
+          {/* <Button
             component={Link}
             to="/addexpense"
             variant="contained"
             sx={btnStyle}
           >
             Add Expenses
+          </Button> */}
+          <Button
+            component={Link}
+            to="/payments"
+            variant="contained"
+            sx={btnStyle}
+          >
+            Payments
           </Button>
         </Box>
         <Box sx={{ flexGrow: 1 }} />
+        <Typography variant="body1" sx={{ color: "white", mr: 2 }}>
+          {freelancerName ? `Hello, ${freelancerName}` : "Hello, Freelancer"}
+        </Typography>
         <Button
           sx={{
             ...btnStyle,

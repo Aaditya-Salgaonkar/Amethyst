@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import SignUp from "./screens/signup";
 import Login from "./screens/login";
 import Home from "./screens/home";
-import Dashboard from "./components/Dashboard";
+
 import Projects from "./components/Projects";
 import Report from "./screens/Report";
 import LandingPage from "./screens/LandingPage";
@@ -13,7 +13,7 @@ import ExpensesDashboard from "./screens/ExpensesDashboard";
 import AddExpense from "./screens/AddExpense";
 import UpdateProject from "./screens/UpdateProject";
 import Reminder from "./screens/reminder";
-
+import Payments from "./screens/Payments";
 const App = () => {
   const [token, setToken] = useState(false);
   const location = useLocation();
@@ -38,15 +38,16 @@ const App = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/expenses" element={<ExpensesDashboard />} />
         <Route path="/addexpense" element={<AddExpense />} />
+        <Route path="/payments" element={<Payments token={token} />} />
         <Route path="/login" element={<Login setToken={setToken} />} />
         <Route
           path="/home"
           element={token ? <Home token={token} /> : <Navigate to="/login" />}
         />
-        <Route
+        {/* <Route
           path="/dashboard"
           element={token ? <Dashboard /> : <Navigate to="/login" />}
-        />
+        /> */}
         <Route
           path="/projects"
           element={token ? <Projects /> : <Navigate to="/login" />}
