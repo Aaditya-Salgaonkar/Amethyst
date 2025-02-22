@@ -38,9 +38,9 @@ const CategoryWiseExpenses = () => {
 , []
     )
   return (
-    <div>
+    <div >
         <div className="flex flex-col items-center">
-      <h2 className="text-2xl font-semibold mb-4">Category-wise Expenses</h2>
+      <h2 className="text-2xl font-semibold mb-2">Category-wise Expenses</h2>
       {chartData.length > 0 ? (
         <PieChart width={400} height={400}>
           <Pie
@@ -57,7 +57,7 @@ const CategoryWiseExpenses = () => {
             ))}
           </Pie>
           <Tooltip />
-          <Legend />
+          <Legend  />
         </PieChart>
       ) : (
         <h1 className="text-xl text-gray-500">No expense data available.</h1>
