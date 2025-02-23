@@ -171,7 +171,7 @@ const Dashboard = ({ token }) => {
                             Pay Status:{" "}
                             {project.payment_status ? "Paid" : "Pending"}
                           </Typography>
-                          <CardActions sx={{ marginTop: 2 }}>
+                          {/* <CardActions sx={{ marginTop: 2 }}>
                             <Button
                               size="small"
                               variant="contained"
@@ -181,7 +181,7 @@ const Dashboard = ({ token }) => {
                             >
                               <b>View Details</b>
                             </Button>
-                          </CardActions>
+                          </CardActions> */}
                         </CardContent>
                       </Card>
                     </Grid2>
