@@ -14,14 +14,16 @@ import { theme } from "../components/Theme";
 import { useState, useEffect } from "react";
 import { supabase } from "../client";
 import Spinner from "../components/Spinner";
+import HomeNavbar from "../components/HomeNavbar";
 //These are the Style object for there respective components
 
 const containerStyle = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+
   // backgroundColor: "background.container",
-  height: "100vh",
+  height: "90vh",
   padding: "0px",
   position: "relative",
   maxWidth: {
@@ -38,7 +40,7 @@ const containerStyle = {
 
 const paperStyle = {
   overflowY: "auto",
-  width: "70%",
+  width: "60%",
   height: "80%",
   borderTopLeftRadius: "25px",
   borderBottomLeftRadius: "25px",
@@ -186,13 +188,13 @@ const ProjectHeader = ({ projName, budget, spent, remain, duedate }) => {
         {projName}
       </Grid2>
       <Grid2 size={2} sx={commonProjectHeaderStyle}>
-        {budget}
+        {`${budget}$`}
       </Grid2>
       <Grid2 size={2} sx={commonProjectHeaderStyle}>
-        {spent}
+      {`${spent}$`}
       </Grid2>
       <Grid2 size={2} sx={commonProjectHeaderStyle}>
-        {remain}
+      {`${remain}$`}
       </Grid2>
       <Grid2 size={2} sx={commonProjectHeaderStyle}>
         {duedate}
@@ -253,18 +255,11 @@ const ProjectItems = ({ itemName = "Dummy" }) => {
   );
 };
 
-
-
-
-
-
 const fetchProjectsWithClientData = async (freelancerId) => {
   try {
     const { data: projects, error: projectError } = await supabase
       .from("projects")
-      .select(
-        " name, due_date, budget_allocated, subtasks"
-      )
+      .select(" name, due_date, budget_allocated, spent, subtasks")
       .eq("freelancerId", freelancerId);
 
     if (projectError) {
@@ -274,12 +269,16 @@ const fetchProjectsWithClientData = async (freelancerId) => {
 
     const projectsWithClientData = await Promise.all(
       projects.map(async (project) => {
-
         return {
           projectName: project.name,
           endDate: project.due_date,
           totalBudget: project.budget_allocated?.toString() || "0",
-          subtasks: project.subtasks ? JSON.parse(project.subtasks).map((task) => task.name) : [],
+          spent: project.spent || 0,
+          subtasks: Array.isArray(project.subtasks)
+            ? project.subtasks.map((task) => task.name)
+            : typeof project.subtasks === "string"
+              ? JSON.parse(project.subtasks).map((task) => task.name)
+              : [],
         };
       })
     );
@@ -290,10 +289,6 @@ const fetchProjectsWithClientData = async (freelancerId) => {
     return [];
   }
 };
-
-
-
-
 
 const Project = ({
   projItems = [],
@@ -326,17 +321,16 @@ const Project = ({
   );
 };
 
-export default function Report({ uuid }) {
-
-  const [loading, setLoading] = useState(false) 
-  const [projects, setProjects] = useState([])
+export default function Report({ uuid, token }) {
+  const [loading, setLoading] = useState(false);
+  const [projects, setProjects] = useState([]);
 
   const loadProjects = async () => {
     if (uuid) {
-      setLoading(true)
+      setLoading(true);
       const fetchedProjects = await fetchProjectsWithClientData(uuid);
       setProjects(fetchedProjects);
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -344,11 +338,28 @@ export default function Report({ uuid }) {
     loadProjects();
   }, []);
 
+  const [freelancerName, setFreelancerName] = useState(null);
+
+  useEffect(() => {
+    const fetchFreelancerName = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      console.log(user);
+      if (user) {
+        setFreelancerName(user.email || "Freelancer");
+      }
+    };
+    fetchFreelancerName();
+  }, []);
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container disableGutters sx={containerStyle}>
-        <Button
+    <div>
+      <HomeNavbar token={token} freelancerName={freelancerName} />
+      <ThemeProvider theme={theme}>
+        <Box sx={{ marginTop: 7 }}></Box>
+        <Container disableGutters sx={containerStyle}>
+          {/* <Button
           style={{
             height: "4%",
             width: "4%",
@@ -361,48 +372,53 @@ export default function Report({ uuid }) {
           onClick={() => window.history.back()}
         >
           BACK
-        </Button>
-        <Box
-          sx={{
-            height: "27%",
-            width: "20%",
-            backgroundColor: "rgba(213, 118, 51, 0.82)",
-            borderRadius: "20px",
-            position: "absolute",
-            top: "5.2%",
-            left: "12%",
-            zIndex: "1",
-          }}
-        ></Box>
-      
-        <Paper sx={paperStyle} elevation={18}>
-          <TopRow />
-          <ListRow />
-          {loading ? <Spinner/> : projects.map((item, index) => (
-            <Project
-              key={index}
-              name={item.projectName}
-              duedate={item.endDate}
-              budget={item.totalBudget}
-              projItems={item.subtasks}
-            />
-          ))}
-        
-        </Paper>
-        
-        <Box
-          sx={{
-            height: "27%",
-            width: "20%",
-            backgroundColor: "rgba(213, 118, 51, 0.82)",
-            borderRadius: "20px",
-            position: "absolute",
-            bottom: "5.2%",
-            right: "12%",
-            zIndex: "1",
-          }}
-        ></Box>
-      </Container>
-    </ThemeProvider>
+        </Button> */}
+          <Box
+            sx={{
+              height: "27%",
+              width: "15%",
+              backgroundColor: "rgba(213, 118, 51, 0.82)",
+              borderRadius: "20px",
+              position: "absolute",
+              top: "4.5%",
+              left: "15%",
+              zIndex: "1",
+            }}
+          ></Box>
+
+          <Paper sx={paperStyle} elevation={18}>
+            <TopRow />
+            <ListRow />
+            {loading ? (
+              <Spinner />
+            ) : (
+              projects.map((item, index) => (
+                <Project
+                  key={index}
+                  name={item.projectName}
+                  duedate={item.endDate}
+                  budget={item.totalBudget}
+                  spent={item.spent}
+                  projItems={item.subtasks}
+                />
+              ))
+            )}
+          </Paper>
+
+          <Box
+            sx={{
+              height: "27%",
+              width: "15%",
+              backgroundColor: "rgba(213, 118, 51, 0.82)",
+              borderRadius: "20px",
+              position: "absolute",
+              bottom: "4.5%",
+              right: "15%",
+              zIndex: "1",
+            }}
+          ></Box>
+        </Container>
+      </ThemeProvider>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { forwardRef, useState,useEffect, useImperativeHandle } from "react";
+import React, { useState } from "react";
 import {
   Paper,
   Box,
@@ -10,17 +10,16 @@ import {
   Stack,
 } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "../client";
-
-
+import Spinner from "./Spinner";
+import { useNavigate } from "react-router-dom";
 export const commonGridItemStyles = {
   display: "flex",
   flexDirection: "column",
   padding: 3,
 };
 
-const commonInputStyles = {
+export const commonInputStyles = {
   "& .MuiOutlinedInput-root": {
     borderRadius: "12px",
     "& .MuiOutlinedInput-notchedOutline": {
@@ -32,14 +31,9 @@ const commonInputStyles = {
   },
 };
 
-const ProjectForm = forwardRef((props, ref) => {
+const ProjectForm = ({ uuid }) => {
   const navigate=useNavigate();
-  const {
-    width = "70%",
-    createOupdate = "nothing",
-    handleOnsubmit = () => {},
-  } = props;
-  
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     projectName: "",
     startDate: "",
@@ -47,30 +41,10 @@ const ProjectForm = forwardRef((props, ref) => {
     totalBudget: "",
     paymentDate: "",
     clientName: "",
+    paymentStatus: false,
+    clientEmail: '',
     subtasks: [""],
   });
-
-  useImperativeHandle(ref, () => ({
-    updateFormData(newData) {
-      setFormData(newData);
-    },
-  }));
-  const [freelancerId, setFreelancerId] = useState(null);
-
-  // Fetch the current user's ID from Supabase Auth
-  useEffect(() => {
-    const fetchUserId = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (user) {
-        setFreelancerId(user.id);
-      } else {
-        console.error("User not logged in:", error);
-      }
-    };
-
-    fetchUserId();
-  }, []);
-
 
   const handleChange = (e, index = null) => {
     const { name, value } = e.target;
@@ -82,29 +56,7 @@ const ProjectForm = forwardRef((props, ref) => {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    const { data, error } = await supabase.from("projects").insert([
-      {
-        name: formData.projectName,
-        start_date: formData.startDate,
-        due_date: formData.endDate,
-        budget_allocated: formData.totalBudget,
-        paymentDate: formData.paymentDate,
-        payment_status: formData.paymentStatus,
-        freelancerId: freelancerId,
-        
-      },
-    ]);
-
-    if (error) {
-      console.error("Error inserting project:", error.message);
-    } else {
-      console.log("Project inserted successfully:", data);
-      navigate('/home')
-    }
-  };
   const addSubtask = () => {
     setFormData((prev) => ({ ...prev, subtasks: [...prev.subtasks, ""] }));
   };
@@ -114,8 +66,139 @@ const ProjectForm = forwardRef((props, ref) => {
     setFormData((prev) => ({ ...prev, subtasks: updatedSubtasks }));
   };
 
+  const createProjectAndInvoice = async (projectData) => {
+    try {
+        // Create the project
+        const { data: project, error: projectError } = await supabase
+            .from("projects")
+            .insert([projectData])
+            .single();
+
+        if (projectError) throw projectError;
+
+        // Automatically create the invoice after the project is created
+        const invoiceData = {
+            project_id: project.p_id,
+            issued_date: new Date(),
+            due_date: new Date(new Date().setMonth(new Date().getMonth() + 1)),  // Example: Due date is next month
+            status: "pending",  // Default status
+            payment_method: "",  // Set this later when payment method is chosen
+            payment_date: null,  // No payment date initially
+        };
+
+        const { error: invoiceError } = await supabase
+            .from("invoice")
+            .insert([invoiceData]);
+
+        if (invoiceError) throw invoiceError;
+
+        console.log("Project and Invoice created successfully");
+    } catch (err) {
+        setError(err.message);
+    }
+};
+
+  const handleCreateProject = async () => {
+    setLoading(true)
+    try {
+      console.log("Creating project...");
+
+      let clientId = null;
+
+      if (formData.clientName) {
+
+        const { data: existingClient, error: clientError } = await supabase
+          .from("clients")
+          .select("id")
+          .eq("name", formData.clientName)
+          .single();
+
+        if (clientError && clientError.code !== "PGRST116") {
+          console.error("Error fetching client:", clientError.message);
+          return;
+        }
+
+        if (existingClient) {
+          clientId = existingClient.id;
+        } else {
+
+          const { data: newClient, error: newClientError } = await supabase
+            .from("clients")
+            .insert([
+              { name: formData.clientName, email: formData.clientEmail || "" },
+            ])
+            .select("id")
+            .single();
+
+          if (newClientError) {
+            console.error("Error creating client:", newClientError.message);
+            return;
+          }
+
+          clientId = newClient.id;
+          console.log("New client created with ID:", clientId);
+        }
+      }
+
+      // Format subtasks (initialize all with status 0)
+      const formattedSubtasks = formData.subtasks
+        .filter((task) => task.trim() !== "") // Remove empty tasks
+        .map((task) => ({
+          name: task,
+          status: 0,
+        }));
+
+      console.log("Formatted subtasks:", formattedSubtasks);
+
+      // Prepare project payload
+      const projectPayload = {
+        name: formData.projectName,
+        start_date: formData.startDate || null, // Directly use the date (assuming correct format)
+        due_date: formData.endDate || null,
+        budget_allocated: formData.totalBudget
+          ? parseFloat(formData.totalBudget)
+          : null, // Cast budget to number
+        "paymentDate": formData.paymentDate || null,
+        payment_status: !!formData.paymentStatus, // Cast to boolean
+        subtasks: JSON.stringify(formattedSubtasks), // Convert subtasks to JSON string
+        client_id: clientId,
+        "freelancerId": uuid || null, // Use freelancerId directly
+        status: false, // Initial status is false
+      };
+
+      const { data: projectData, error: projectError } = await supabase
+        .from("projects")
+        .insert([projectPayload])
+        .select();
+
+      if (projectError) {
+        console.error("Error creating project:", projectError.message);
+      } else {
+        console.log("Project created successfully!", projectData);
+        alert("Project created successfully!");
+        navigate(-1);
+        setFormData({
+          projectName: "",
+          startDate: "",
+          endDate: "",
+          totalBudget: "",
+          paymentDate: "",
+          clientName: "",
+          clientEmail: '',
+          paymentStatus: false,
+          subtasks: [""],
+        })
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error.message);
+    }
+    await createProjectAndInvoice(newProjectData);
+    setLoading(false)
+  };
+
   return (
-    <Paper
+
+   loading ? <Spinner top="1%"/> : <Paper
       elevation={18}
       sx={{
         position: "absolute",
@@ -132,7 +215,7 @@ const ProjectForm = forwardRef((props, ref) => {
           x20: "95%",
         },
         width: {
-          x10: width,
+          x10: "70%",
           x76: "70%",
           x64: "80%",
           x45: "90%",
@@ -158,7 +241,7 @@ const ProjectForm = forwardRef((props, ref) => {
         }}
         variant="h5"
       >
-        {createOupdate} Project
+        Create Project
       </Typography>
 
       <Grid2 container sx={{ width: "100%", height: "80%" }}>
@@ -175,7 +258,12 @@ const ProjectForm = forwardRef((props, ref) => {
             x20: 12,
           }}
         >
-          <Box sx={{ width: "100%", height: "80%" }}>
+          <Box
+            sx={{
+              width: "100%",
+              height: "80%",
+            }}
+          >
             <Grid2 container sx={{ height: "100%", width: "100%" }}>
               <Grid2
                 item
@@ -336,6 +424,17 @@ const ProjectForm = forwardRef((props, ref) => {
                   }}
                 />
               </Grid2>
+
+              <Grid2
+                item
+                size={6}
+                sx={{
+                  ...commonGridItemStyles,
+                }}
+              >
+                
+              </Grid2>
+
             </Grid2>
           </Box>
         </Grid2>
@@ -380,6 +479,7 @@ const ProjectForm = forwardRef((props, ref) => {
               >
                 Subtasks
               </Typography>
+              
 
               {formData.subtasks.map((subtask, index) => (
                 <Grid2 container spacing={1} alignItems="center" key={index}>
@@ -392,6 +492,8 @@ const ProjectForm = forwardRef((props, ref) => {
                       required
                       sx={{ ...commonInputStyles }}
                     />
+
+
                   </Grid2>
                   <Grid2 item size={2}>
                     {index > 0 && (
@@ -433,7 +535,25 @@ const ProjectForm = forwardRef((props, ref) => {
                 Add
               </Button>
             </Stack>
+            <Typography
+                  variant="subtitle1"
+                  sx={{ fontSize: "1rem", ml: 1, mb: 1,mt:5 }}
+                >
+                  Client Email
+                </Typography>
+                <TextField
+                  fullWidth
+                  name="clientEmail"
+                  value={formData.clientEmail}
+                  placeholder={formData.clientEmail}
+                  onChange={handleChange}
+                  required
+                  sx={{
+                    ...commonInputStyles,
+                  }}
+                />
           </Box>
+          
         </Grid2>
       </Grid2>
 
@@ -459,13 +579,13 @@ const ProjectForm = forwardRef((props, ref) => {
         <Button
           sx={{ ml: 4, mr: 10 }}
           variant="contained"
-          onClick={handleSubmit}
+          onClick={handleCreateProject}
         >
-          {createOupdate}
+          Create
         </Button>
       </Stack>
     </Paper>
   );
-});
+};
 
 export default ProjectForm;

@@ -4,6 +4,7 @@ import { supabase } from "../client";
 import { Link } from "react-router-dom";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { theme } from "../components/Theme";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Paper,
@@ -15,8 +16,10 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import { motion } from "framer-motion";
-
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 const Signup = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     fullname: "",
     email: "",
@@ -34,7 +37,7 @@ const Signup = () => {
   async function handleSubmit(event) {
     event.preventDefault();
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -43,8 +46,32 @@ const Signup = () => {
           },
         },
       });
+
       if (error) throw error;
+
+      const { user } = data;
+
+      if (user) {
+        const { data: freelancer, error: freelancerError } = await supabase
+          .from("freelancer")
+          .upsert(
+            {
+              id: user.id,
+              email: user.email,
+              name: formData.fullname || "",
+            },
+            { onConflict: ["email"] }
+          )
+          .select("id")
+          .single();
+
+        if (freelancerError) throw freelancerError;
+
+        console.log("Freelancer ID:", freelancer.id);
+      }
+
       alert("Check your email for a verification link!");
+      navigate("/login");
     } catch (error) {
       alert(error.message);
     }
@@ -73,12 +100,15 @@ const Signup = () => {
               flexDirection: "column",
               paddingLeft: 6,
               paddingRight: 6,
-              paddingTop: 11,
+              paddingTop: 4,
               paddingBottom: 11,
               borderRadius: 4,
               width: { xs: "90%", sm: "400px", x12: "500px" },
             }}
           >
+            <div className="flex justify-left">
+                <a href="/landingpage" className="bg-gradient-to-r from-orange-500 to-orange-800 p-3 -ml-5 mb-5 rounded-md"><ArrowBackIcon /></a>
+            </div>
             <Typography
               component="h1"
               variant="h4"
@@ -169,7 +199,7 @@ const Signup = () => {
             >
               Already have an account?{" "}
               <Link
-                to="/"
+                to="/login"
                 style={{
                   textDecoration: "none",
                   fontWeight: "bold",

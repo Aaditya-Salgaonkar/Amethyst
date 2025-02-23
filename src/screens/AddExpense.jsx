@@ -26,7 +26,7 @@ const AddExpense = () => {
 
       const { data, error } = await supabase
         .from("projects")
-        .select("p_id, name")
+        .select("p_id, name,spent")
         .eq("freelancerId", user.id);
 
       if (error) {
@@ -50,6 +50,26 @@ const AddExpense = () => {
       console.error("Error fetching user:", authError);
       return;
     }
+    if (!formData.projectId) {
+      alert("Please select a project.");
+      return;
+    }
+
+ // Fetch current spent amount for the selected project
+ const { data: projectData, error: projectError } = await supabase
+ .from("projects")
+ .select("spent")
+ .eq("p_id", formData.projectId)
+ .single();
+
+if (projectError) {
+ console.error("Error fetching project data:", projectError);
+ return;
+}
+
+const currentSpent = projectData?.spent || 0;
+const newSpent = currentSpent + parseFloat(formData.amount);
+
 
     const { error } = await supabase.from("expenses").insert([
       {
@@ -65,6 +85,16 @@ const AddExpense = () => {
     if (error) {
       console.error("Error submitting expense:", error);
     } else {
+       // Update the spent value in the projects table
+    const { error: updateError } = await supabase
+    .from("projects")
+    .update({ spent: newSpent })
+    .eq("p_id", formData.projectId);
+
+  if (updateError) {
+    console.error("Error updating spent amount:", updateError);
+    return;
+  }
       alert("Expense added successfully!");
       setFormData({
         title: "",

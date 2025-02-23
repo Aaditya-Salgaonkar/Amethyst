@@ -17,7 +17,7 @@ import { theme } from "../components/Theme";
 import { supabase } from "../client";
 import CategoryWiseExpenses from "../components/CategoryWiseExpenses";
 import HomeNavbar from "../components/HomeNavbar";
-
+import Spinner from "../components/Spinner";
 const ExpensesDashboard = ({ token }) => {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -85,7 +85,7 @@ const ExpensesDashboard = ({ token }) => {
     <div>
       <HomeNavbar token={token} freelancerName={freelancerName} />
       <ThemeProvider theme={theme}>
-        <Box sx={{ display: "flex", minHeight: "90vh" }}>
+        <Box sx={{ display: "flex", minHeight: "90vh",marginTop:7 }}>
           <CategoryWiseExpenses />
           <Box component="main" sx={{ flexGrow: 1, p: 3,  fontWeight:'bold' }}>
           <Typography variant="h6" gutterBottom sx={{marginBottom:5}}>
@@ -98,7 +98,9 @@ const ExpensesDashboard = ({ token }) => {
                 <Card sx={{ p: 2, maxHeight: "70vh",width:'50vw', overflowY: "auto", boxShadow: 3, scrollbarWidth:'none',}}>
                   
                   {loading ? (
-                    <Typography color="textSecondary">Loading...</Typography>
+                    <Box>
+                      <Spinner />
+                    </Box>
                   ) : expenses.length > 0 ? (
                     <Box>
                       {expenses.map((expense) => (

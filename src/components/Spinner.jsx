@@ -1,4 +1,3 @@
-
 import React from 'react';
 import spinnerGif from '../assets/spinner.gif';
 

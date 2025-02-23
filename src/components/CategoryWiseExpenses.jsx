@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
-import { supabase } from "../client";
+import { supabase } from "../../src/client";
 import { ThemeProvider, createTheme, Box, Typography } from "@mui/material";
-import { theme } from "./Theme";
+import { theme } from "../../src/components/Theme";
 import { Margin } from "@mui/icons-material";
 // Dark Mode Theme
 const darkTheme = createTheme({
@@ -77,8 +77,8 @@ const CategoryWiseExpenses = () => {
           pt:2
         }}
       >
-        <Typography variant="h5" fontWeight="bold" gutterBottom>
-          Category-wise Expenses
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
+          Expenses
         </Typography>
         {chartData.length > 0 ? (
           <PieChart width={500} height={500}>

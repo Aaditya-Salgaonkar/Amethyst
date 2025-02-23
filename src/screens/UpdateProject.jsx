@@ -22,7 +22,7 @@ import {
 } from "../components/ProjectForm";
 import { supabase } from "../client";
 
-
+import { useNavigate } from "react-router-dom";
 const containerStyle = {
   display: "flex",
   justifyContent: "center",
@@ -89,7 +89,12 @@ const fetchProjectsWithClientData = async (freelancerId) => {
           clientName: clientName || "Unknown",
           paymentStatus: project.payment_status,
           status: project.status,
-          subtasks: project.subtasks ? JSON.parse(project.subtasks).map((task) => task.name) : [],
+          subtasks: Array.isArray(project.subtasks) 
+  ? project.subtasks.map((task) => task.name) 
+  : typeof project.subtasks === "string" 
+  ? JSON.parse(project.subtasks).map((task) => task.name) 
+  : [],
+
         };
       })
     );
@@ -101,6 +106,96 @@ const fetchProjectsWithClientData = async (freelancerId) => {
   }
 };
 
+// const demoObject = [
+//   {
+//     projectId: "",
+//     projectName: "E-commerce Website",
+//     startDate: "2023-06-15",
+//     endDate: "2023-12-20",
+//     totalBudget: "50000",
+//     paymentDate: "2023-12-25",
+//     clientName: "ABC Retail Ltd.",
+//     paymentStatus: true,
+//     subtasks: ["Design", "Development", "Testing"],
+//   },
+//   {
+//     projectId: "",
+//     projectName: "Mobile Banking App",
+//     startDate: "2023-07-01",
+//     endDate: "2024-02-10",
+//     totalBudget: "75000",
+//     paymentDate: "2024-02-15",
+//     clientName: "XYZ Bank",
+//     paymentStatus: true,
+//     subtasks: ["Backend Setup", "UI/UX", "Security Testing"],
+//   },
+//   {
+//     projectId: "",
+//     projectName: "Healthcare Portal",
+//     startDate: "2023-08-10",
+//     endDate: "2024-03-05",
+//     totalBudget: "60000",
+//     paymentDate: "2024-03-10",
+//     clientName: "MediCare Solutions",
+//     paymentStatus: true,
+//     subtasks: ["Database Design", "API Integration", "User Testing"],
+//   },
+//   {
+//     projectId: "",
+//     projectName: "AI Chatbot Integration",
+//     startDate: "2023-09-05",
+//     endDate: "2024-04-01",
+//     totalBudget: "45000",
+//     paymentDate: "2024-04-05",
+//     clientName: "Tech Innovators Inc.",
+//     paymentStatus: true,
+//     subtasks: ["NLP Model", "Backend Integration", "Deployment"],
+//   },
+//   {
+//     projectId: "",
+//     projectName: "Inventory Management System",
+//     startDate: "2023-10-12",
+//     endDate: "2024-05-15",
+//     totalBudget: "55000",
+//     paymentDate: "2024-05-20",
+//     clientName: "Global Logistics",
+//     paymentStatus: true,
+//     subtasks: ["Requirement Analysis", "Prototype", "Final Testing"],
+//   },
+//   {
+//     projectId: "",
+//     projectName: "Online Learning Platform",
+//     startDate: "2023-11-20",
+//     endDate: "2024-06-30",
+//     totalBudget: "70000",
+//     paymentDate: "2024-07-05",
+//     clientName: "EduTech Academy",
+//     paymentStatus: true,
+//     subtasks: ["Video Streaming", "Quiz System", "Progress Tracking"],
+//   },
+//   {
+//     projectId: "",
+//     projectName: "CRM Software Development",
+//     startDate: "2023-12-01",
+//     endDate: "2024-08-10",
+//     totalBudget: "65000",
+//     paymentDate: "2024-08-15",
+//     clientName: "NextGen Enterprises",
+//     paymentStatus: true,
+//     subtasks: ["Lead Management", "Automation", "Reports Dashboard"],
+//   },
+//   {
+//     projectId: "",
+//     projectName: "Hotel Booking System",
+//     startDate: "2024-01-15",
+//     endDate: "2024-09-20",
+//     totalBudget: "80000",
+//     paymentDate: "2024-09-25",
+//     clientName: "Luxury Stays",
+//     paymentStatus: true,
+//     subtasks: ["Room Availability", "Payment Gateway", "User Reviews"],
+//   },
+// ];
 
 const CustomCard = ({ project, change }) => {
   return (
@@ -178,7 +273,7 @@ const CustomCard = ({ project, change }) => {
 };
 
 export default function UpdateProject({uuid}) {
-
+const navigate=useNavigate();
   const [loading, setLoading] = useState(false)
   const [projects, setProjects] = useState([])
   const [project, setProject] = useState({
@@ -217,10 +312,12 @@ export default function UpdateProject({uuid}) {
         budget_allocated: project.totalBudget ? parseFloat(project.totalBudget) : null,
         "paymentDate": project.paymentDate || null,
         payment_status: !!project.paymentStatus,
-        status: !!project.status,
+        status: project.status,
         subtasks: JSON.stringify(project.subtasks.map((task) => ({ name: task, status: 0 }))),
       };
-  
+      {
+        console.log(project)
+      }
       const { error } = await supabase
         .from("projects")
         .update(updatedProjectPayload)
@@ -230,6 +327,7 @@ export default function UpdateProject({uuid}) {
         alert("Error updating project: " + error.message);
       } else {
         alert("Project updated successfully!");
+        navigate(-1)
         setProject({
           projectId: "",
           projectName: "",
@@ -288,7 +386,6 @@ export default function UpdateProject({uuid}) {
       >
         <Container sx={containerStyle}>
           <Grid2 container sx={{ height: "100vh", width: "100%" }}>
-            
             <Grid2
               item
               size={3}
@@ -317,7 +414,6 @@ export default function UpdateProject({uuid}) {
                   project={project}
                   change={handleProjectSelect}
                 />
-                
               ))}
             </Grid2>
             <Grid2 item size={9}>
@@ -597,31 +693,7 @@ export default function UpdateProject({uuid}) {
                               ...commonGridItemStyles,
                             }}
                           >
-                            <Typography
-                              variant="subtitle1"
-                              sx={{ fontSize: "1rem", ml: 1, mb: 1 }}
-                            >
-                              Project Status
-                            </Typography>
-                            <FormControl
-                              fullWidth
-                              sx={{ ...commonInputStyles }}
-                            >
-                              <Select
-                                name="status"
-                                value={project.status}
-                                onChange={(e) =>
-                                  setProject((prev) => ({
-                                    ...prev,
-                                    status: e.target.value,
-                                  }))
-                                }
-                                required
-                              >
-                                <MenuItem value={true}>Completed</MenuItem>
-                                <MenuItem value={false}>Pending</MenuItem>
-                              </Select>
-                            </FormControl>
+                           
                           </Grid2>
                           <Grid2 item size={6}></Grid2>
                         </Grid2>
@@ -732,6 +804,31 @@ export default function UpdateProject({uuid}) {
                             Add
                           </Button>
                         </Stack>
+                        <Typography
+                              variant="subtitle1"
+                              sx={{ fontSize: "1rem", ml: 1, mb: 1,mt:5 }}
+                            >
+                              Project Status
+                            </Typography>
+                            <FormControl
+                              fullWidth
+                              sx={{ ...commonInputStyles }}
+                            >
+                              <Select
+                                name="status"
+                                value={project.status}
+                                onChange={(e) =>
+                                  setProject((prev) => ({
+                                    ...prev,
+                                    status: e.target.value,
+                                  }))
+                                }
+                                required
+                              >
+                                <MenuItem value={true}>Completed</MenuItem>
+                                <MenuItem value={false}>Pending</MenuItem>
+                              </Select>
+                            </FormControl>
                       </Box>
                     </Grid2>
                   </Grid2>

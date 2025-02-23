@@ -17,19 +17,19 @@ const Navbar = () => {
             <span className="text-xl tracking-tighter">WorkSphere</span>
           </div>
           <ul className="hidden lg:flex ml-14 space-x-12">
-            <a href="">Features</a>
-            <a href="">About</a>
-            <a href="">Contact</a>
+            <a href="#features">Features</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
           </ul>
-          <div className="hidden lg:flex justify-center space-x-12 items-center">
-            <Link to="/login" className="px-3 py-2 border rounded-md">
-              Log in
+          <div className="hidden lg:flex justify-center space-x-5 items-center mr-5">
+            <Link to="/login" className="px-3 py-2 border-orange-500 border-2 rounded-md">
+              Log In
             </Link>
             <Link
               to="/signup"
-              className="bg-gradient-to-r from-orange-500 to-orange-800 px-3 py-2 border rounded-md"
+              className="bg-gradient-to-r from-orange-500 to-orange-800 px-3 py-2  rounded-md"
             >
-              Create an Account
+              Sign Up
             </Link>
           </div>
           <div className="lg:hidden md:flex flex-col justify-end">

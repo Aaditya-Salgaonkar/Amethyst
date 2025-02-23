@@ -3,12 +3,12 @@ import { RiArrowUpDoubleLine, RiTeamLine, RiTimerLine } from "@remixicon/react";
 
 const FeaturesSection = () => {
   return (
-    <div className="relative mt-20 border-b border-neutral-800 min-h-[800px]">
-      <div className="text-center">
+    <div className="relative border-b-2 border-gray-700 min-h-[600px] py-32">
+      <div className="text-center mt-20">
         <span className="bg-neutral-800 text-orange-500 rounded-full h-6 text-sm font-medium px-2 py-1 uppercase">
-          Feature
+          Features
         </span>
-        <h2 className="text-3xl sm:text-5xl lg:text-6xl mt-10 lg:mt-20 tracking-wide">
+        <h2 className="text-3xl sm:text-5xl lg:text-6xl mt-10 lg:mt-10 tracking-wide">
           Simplify Your
           <span className="bg-gradient-to-r from-orange-500 to-orange-800 text-transparent bg-clip-text">
             {" "}

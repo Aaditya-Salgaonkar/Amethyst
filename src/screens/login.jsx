@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
-
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 const Login = ({ setToken }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -24,7 +24,6 @@ const Login = ({ setToken }) => {
     password: "",
   });
 
-  // Retrieve token from localStorage on component mount
   useEffect(() => {
     const storedToken = localStorage.getItem("authToken");
     if (storedToken) {
@@ -71,6 +70,7 @@ const Login = ({ setToken }) => {
           alignItems: "center",
         }}
       >
+        
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -83,12 +83,16 @@ const Login = ({ setToken }) => {
               flexDirection: "column",
               paddingLeft: 6,
               paddingRight: 6,
-              paddingTop: 11,
+              paddingTop: 4,
               paddingBottom: 11,
               borderRadius: 4,
               width: { xs: "90%", sm: "400px", x12: "500px" },
             }}
           >
+            <div className="flex justify-left">
+                <a href="/landingpage" className="bg-gradient-to-r from-orange-500 to-orange-800 p-3 -ml-5 mb-5 rounded-md"><ArrowBackIcon /></a>
+            </div>
+            
             <Typography
               component="h1"
               variant="h4"

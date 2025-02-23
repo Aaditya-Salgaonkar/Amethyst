@@ -5,7 +5,7 @@ const Herosection = () => {
   return (
     <div>
 
-      <div className="flex flex-col items-center mt-6 lg:mt-20">
+      <div className="flex flex-col items-center mt-6 lg:mt-20 border-b-2 border-gray-700 pb-40">
         
             <h1 className='text-4xl lg:text-7xl sm:text-6xl text-center tracking-wide'>WorkSphere Tools
                 <span className='bg-gradient-to-r from-orange-500 to-orange-800 text-transparent bg-clip-text'> for Freelancers</span> 
@@ -16,7 +16,7 @@ const Herosection = () => {
 
             </p>
             <div className="flex justify-center my-10">
-                <a href="" className="bg-gradient-to-r from-orange-500 to-orange-800 px-4 py-3 mx-3 rounded-md">Start for free</a>
+                <a href="/signup" className="bg-gradient-to-r from-orange-500 to-orange-800 px-4 py-3 mx-3 rounded-md">Get Started</a>
             </div>
       </div>
     </div>
