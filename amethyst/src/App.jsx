@@ -14,6 +14,8 @@ import AddExpense from "./screens/AddExpense";
 import UpdateProject from "./screens/UpdateProject";
 import Reminder from "./screens/reminder";
 import Payments from "./screens/Payments";
+import ViewExpenses from "./screens/ViewExpenses";
+import ProductivityTracker from "./screens/ProductivityTracker"
 const App = () => {
   const [token, setToken] = useState(false);
   const location = useLocation();
@@ -38,6 +40,8 @@ const App = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/expenses" element={<ExpensesDashboard />} />
         <Route path="/addexpense" element={<AddExpense />} />
+        <Route path="/viewexpenses" element={<ViewExpenses />} />
+        <Route path="/productivitytracker" element={<ProductivityTracker />} />
         <Route path="/payments" element={<Payments token={token} />} />
         <Route path="/login" element={<Login setToken={setToken} />} />
         <Route

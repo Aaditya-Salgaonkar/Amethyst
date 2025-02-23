@@ -116,6 +116,7 @@ const ProjectForm = ({ uuid }) => {
         }));
 
       console.log("Formatted subtasks:", formattedSubtasks);
+      console.log(uuid);
 
       // Prepare project payload
       const projectPayload = {

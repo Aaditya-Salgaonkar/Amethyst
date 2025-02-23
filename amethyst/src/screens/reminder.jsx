@@ -175,6 +175,9 @@ export default function Reminder({uuid}) {
                   width: "100%",
                   borderRadius: "15px",
                   overflow: "hidden",
+                  padding:"5px"
+                  
+                  
                 }}
               >
                 <Grid2
@@ -199,7 +202,7 @@ export default function Reminder({uuid}) {
                       sx={{
                         height: "100%",
                         width: "100%",
-                        padding: 2,
+                        padding:1,
                         pl: 6,
                       }}
                     >
