@@ -233,7 +233,7 @@ const Payments = ({ token }) => {
     };
 
     return (
-        <div>
+        <div style={{marginTop: '5%'}}>
             <HomeNavbar token={token} freelancerName={freelancerName} />
             <ThemeProvider theme={theme}>
                 <Container maxWidth="lg" sx={{ mt: 4 }}>

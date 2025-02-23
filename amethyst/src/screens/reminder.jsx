@@ -171,9 +171,10 @@ export default function Reminder({uuid}) {
                   backgroundColor: "rgb(39, 39, 39)",
                   display: "flex",
                   alignItems: "center",
-                  height: "20%",
+                  height: "22%",
                   width: "100%",
                   borderRadius: "15px",
+                  padding: '5px',
                   overflow: "hidden",
                 }}
               >

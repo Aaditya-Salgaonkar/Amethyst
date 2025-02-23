@@ -10,10 +10,11 @@ import {
     Button,
     CircularProgress,
     Alert,
+    Box,
+    Stack,
 } from "@mui/material";
 import { Refresh, AddCircleOutline } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import HomeNavbar from "../components/HomeNavbar";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "../components/Theme";
 const Dashboard = ({token}) => {
@@ -26,21 +27,7 @@ const Dashboard = ({token}) => {
         fetchProjects();
     }, []);
 
-    const [freelancerName, setFreelancerName] = useState(null);
-
-  // Fetch freelancer's name on component mount
-  useEffect(() => {
-    const fetchFreelancerName = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      console.log(user)
-      if (user) {
-        // Fetch user's name (assuming it's stored in the user's profile or user table)
-        setFreelancerName(user.email || "Freelancer");
-      }
-    };
-
-    fetchFreelancerName();
-  }, []);
+    
     const fetchProjects = async () => {
         setLoading(true);
         setError(null);
@@ -57,16 +44,32 @@ const Dashboard = ({token}) => {
     };
 
     return (
-      <div>
-        <HomeNavbar token={token} freelancerName={freelancerName}></HomeNavbar>
         
+        <Box sx={{
+            width: '90%',
+            height: 'auto',
+            marginTop: "4%",
+            overflowY: 'auto',
+            scrollbarWidth: 'none', 
+            '&::-webkit-scrollbar': {
+                display: 'none' 
+            }
+        }}>
+      <div>
         <ThemeProvider theme={theme}>
         <Container maxWidth="md" sx={{ mt: 4 }}>
      
-     <Grid2 container justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
-         <Typography variant="h4" fontWeight="bold">
+     <Grid2 container justifyContent="flex-start" alignItems="center" sx={{ mb: 4 }}>
+         <Stack direction={"column"} sx={{height: '60px'}}>
+         <Typography  variant="h4" fontWeight="bold" >
              Project Dashboard
          </Typography>
+         <Box height={"18%"} width={"110%"} sx={{
+            background: 'linear-gradient(135deg, rgb(255, 77, 0) 5%, rgb(255, 77, 0) 35%, rgb(255, 153, 51) 60%)',
+            clipPath: 'polygon(0 0, 96% 0, 100% 100%, 0 100%)'
+            }}/>
+         </Stack>
+         <Box sx={{ flexGrow: 0.8 }} />
          <div className="">
              <Button variant="outlined" startIcon={<Refresh />} onClick={fetchProjects} sx={{ mr: 2 }}>
                  Refresh
@@ -124,10 +127,13 @@ const Dashboard = ({token}) => {
                  </Card>
              </Grid2>
          ))}
-     </Grid2>
- </Container>
+         
+            </Grid2>
+            </Container>
         </ThemeProvider>
       </div>
+      </Box>
+
     );
 };
 

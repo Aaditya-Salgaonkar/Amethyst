@@ -1,29 +1,38 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Box } from "@mui/material";
-import HomeNavbar from "../components/HomeNavbar";
-// import Dashboard from "../components/Dashboard";
 import Dashboard from "./Dashboard";
-
+import HomeNavbar from "../components/HomeNavbar";
+import { useEffect, useState } from "react";
+import { supabase } from "../client";
 
 const Home = ({ token }) => {
+  const [freelancerName, setFreelancerName] = useState(null);
+
+    useEffect(() => {
+      const fetchFreelancerName = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        console.log(user)
+        if (user) {
+          setFreelancerName(user.email || "Freelancer");
+        }
+      };
+      fetchFreelancerName();
+    }, []);
+
+
   return (
     <Box
       sx={{
-        width: "100%",
-        height: "100%",
-        backgroundColor: "#262626",
+        width: "100vw",
+        height: "100vh",
+        backgroundColor: " #262626",
+        display: 'flex',
+        justifyContent: 'center',
+        overflowX: 'hidden',
       }}
     >
-      <Box
-        sx={{
-          width: "100%",
-          height: "100%",
-          backgroundColor: "#262626",
-          paddingBottom: 20,
-        }}
-      >
+        <HomeNavbar token={token} freelancerName={freelancerName}/>
         <Dashboard token={token} />
-      </Box>
     </Box>
   );
 };

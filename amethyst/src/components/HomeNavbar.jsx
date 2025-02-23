@@ -30,7 +30,7 @@ export default function HomeNavbar({ freelancerName }) {
   }
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: "rgb(15, 15, 15)" }}>
+    <AppBar sx={{ display: 'flex',zIndex: '2', position: 'absolute', top: 0,left: 0, backgroundColor: "rgb(15, 15, 15)", width: '100vw', }}>
       <Toolbar>
         <Stack direction={"row"} spacing={1} sx={{  height: '100%', width: '15%' }}>
         <img style={{
@@ -45,11 +45,11 @@ export default function HomeNavbar({ freelancerName }) {
         <Box sx={{ display: "flex", gap: 4 }}>
           <Button
             component={Link}
-            to="/Dashboard"
+            to="/home"
             variant="contained"
             sx={btnStyle}
           >
-            Dashboard
+            Home
           </Button>
           <Button
             component={Link}

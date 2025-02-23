@@ -7,7 +7,6 @@ import Home from "./screens/home";
 import Projects from "./components/Projects";
 import Report from "./screens/Report";
 import LandingPage from "./screens/LandingPage";
-import { demoObject } from "./Test/demoObject";
 import ProjectCreate from "./screens/ProjectCreate";
 import ExpensesDashboard from "./screens/ExpensesDashboard";
 import AddExpense from "./screens/AddExpense";
