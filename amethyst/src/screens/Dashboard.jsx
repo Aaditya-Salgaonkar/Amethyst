@@ -14,15 +14,18 @@ import {
   Divider,
 } from "@mui/material";
 import Spinner from "../components/Spinner";
+import CloseIcon from "@mui/icons-material/Close";
 import { Refresh, AddCircleOutline } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "../components/Theme";
+import { motion } from "framer-motion";
 const Dashboard = ({ token }) => {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   useEffect(() => {
     fetchProjects();
@@ -64,7 +67,7 @@ const Dashboard = ({ token }) => {
         },
       }}
     >
-      {loading === true ? (
+      {loading ? (
         <Spinner />
       ) : (
         <div>
@@ -132,8 +135,9 @@ const Dashboard = ({ token }) => {
                       <Card
                         variant="outlined"
                         sx={{
-                          borderRadius: 5,
+                          borderRadius: 4,
                           transition: "0.3s",
+                          position: "relative",
                           background:
                             "linear-gradient(135deg, rgb(15, 15, 15) 0%, rgb(26, 26, 26) 100%)",
                           boxShadow: "0 4px 10px rgba(15, 15, 15, 0.6)",
@@ -153,7 +157,7 @@ const Dashboard = ({ token }) => {
                           </Typography>
                           <Divider sx={{ backgroundColor: "white", my: 1 }} />
                           <Typography variant="body2" mt={1}>
-                            Status: {project.status ? "Active" : "Completed"}
+                            Status: {project.status ? "Completed" : "Active"}
                           </Typography>
                           <Typography variant="body2" mt={1}>
                             Budget: ${project.budget_allocated}
@@ -163,7 +167,7 @@ const Dashboard = ({ token }) => {
                           </Typography>
                           <Typography
                             variant="body2"
-                            mt={1}
+                            mt={1.5}
                             color={
                               project.payment_status ? "#4CAF50" : "#FF5252"
                             }
@@ -171,17 +175,18 @@ const Dashboard = ({ token }) => {
                             Pay Status:{" "}
                             {project.payment_status ? "Paid" : "Pending"}
                           </Typography>
-                          {/* <CardActions sx={{ marginTop: 2 }}>
+                          <CardActions sx={{ marginTop: 2 }}>
                             <Button
                               size="small"
                               variant="contained"
                               sx={{
                                 color: "rgb(255, 255, 255)",
                               }}
+                              onClick={() => setSelectedProject(project)}
                             >
                               <b>View Details</b>
                             </Button>
-                          </CardActions> */}
+                          </CardActions>
                         </CardContent>
                       </Card>
                     </Grid2>
@@ -191,6 +196,80 @@ const Dashboard = ({ token }) => {
             </Container>
           </ThemeProvider>
         </div>
+      )}
+      {selectedProject && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+        >
+          <Box
+            sx={{
+              width: "30%",
+              height: "auto",
+              position: "absolute",
+              top: "15%",
+              left: "30%",
+              background: "linear-gradient(135deg, #1e1e1e, #2a2a2a)",
+              borderRadius: "20px",
+              padding: 5,
+              boxShadow: "0 6px 20px rgba(0, 0, 0, 0.7)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 3,
+            }}
+          >
+            <Button
+              sx={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                color: "#FF5252",
+              }}
+              onClick={() => setSelectedProject(null)}
+            >
+              <CloseIcon />
+            </Button>
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              color="#FF9800"
+              textAlign="center"
+              sx={{ mb: 3 }}
+            >
+              {selectedProject.name}
+            </Typography>
+            <Divider sx={{ backgroundColor: "#FF9800", mb: 3 }} />
+
+            <Stack spacing={3}>
+              <Typography variant="h6" color="white">
+                <b>Status:</b> {selectedProject.status ? "Completed" : "Active"}
+              </Typography>
+              <Typography variant="h6" color="white">
+                <b>Start Date:</b> {selectedProject.start_date}
+              </Typography>
+              <Typography variant="h6" color="white">
+                <b>Due Date:</b> {selectedProject.due_date}
+              </Typography>
+              <Typography variant="h6" color="white">
+                <b>Budget Allocated:</b> ${selectedProject.budget_allocated}
+              </Typography>
+              <Typography
+                variant="h6"
+                color={selectedProject.payment_status ? "#4CAF50" : "#FF5252"}
+              >
+                <b>Payment Status:</b>{" "}
+                {selectedProject.payment_status ? "Paid" : "Pending"}
+              </Typography>
+              {selectedProject.payment_status && (
+                <Typography variant="h6" color="white">
+                  <b>Payment Date:</b> {selectedProject.paymentDate}
+                </Typography>
+              )}
+            </Stack>
+          </Box>
+        </motion.div>
       )}
     </Box>
   );
