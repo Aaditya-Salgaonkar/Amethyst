@@ -1,71 +1,148 @@
-import React from "react";
-import SideNavBar from "../components/SideNavBar";
-import { Add, Pageview, Payments } from "@mui/icons-material";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import { Typography, Box, Grid, Button, Card, Divider } from "@mui/material";
+import { ThemeProvider } from "@mui/material";
+import { theme } from "../components/Theme";
+import { supabase } from "../client";
+import CategoryWiseExpenses from "../components/CategoryWiseExpenses";
+import HomeNavbar from "../components/HomeNavbar";
 
-const data = [
-  { name: "Rent", value: 400 },
-  { name: "Groceries", value: 300 },
-  { name: "Entertainment", value: 200 },
-  { name: "Utilities", value: 100 },
-];
+const ExpensesDashboard = ({ token }) => {
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [freelancerName, setFreelancerName] = useState(null);
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+  useEffect(() => {
+    const fetchFreelancerName = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      console.log(user);
+      if (user) {
+        setFreelancerName(user.email || "Freelancer");
+      }
+    };
 
-const ExpensesDashboard = () => {
+    fetchFreelancerName();
+  }, []);
+
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      setLoading(true);
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        console.error("Error getting user:", authError);
+        setLoading(false);
+        return;
+      }
+
+      console.log("Logged-in User ID:", user.id);
+
+      const { data: freelancerData, error: freelancerError } = await supabase
+        .from("freelancer")
+        .select("id")
+        .eq("id", user.id)
+        .single();
+
+      if (freelancerError || !freelancerData) {
+        console.error("Freelancer not found:", freelancerError);
+        setLoading(false);
+        return;
+      }
+
+      console.log("Freelancer ID:", freelancerData.id);
+
+      const { data: expensesData, error: expensesError } = await supabase
+        .from("expenses")
+        .select("*")
+        .eq("freelancer_id", freelancerData.id)
+        .order("created_at", { ascending: false });
+
+      if (expensesError) {
+        console.error("Error fetching expenses:", expensesError);
+      } else {
+        console.log("Fetched Expenses:", expensesData);
+        setExpenses(expensesData);
+      }
+
+      setLoading(false);
+    };
+
+    fetchExpenses();
+  }, []);
+
   return (
-    <div className="flex h-screen">
-      <div className="w-80 h-screen">
-        <SideNavBar />
-      </div>
-
-      <div className="flex-1 w-full h-full flex items-center justify-center">
-        <div className="flex p-10 w-full h-full flex-col items-center justify-center gap-4">
-          <div className="bg-white  text-center w-full h-full border-white bg-opacity-5 rounded-3xl text-2xl flex items-center justify-center">
-            <PieChart width={400} height={400}>
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                outerRadius={100}
-                fill="#8884d8"
-                dataKey="value"
-                label
-              >
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </div>
-
-          <div className="p-5 bg-white w-full bg-opacity-5 h-full gap-4 rounded-3xl flex flex-row justify-between items-center">
-            <Link to="/addexpense" className="h-full w-1/3">
-              <div className="bg-white bg-opacity-5 w-full h-full rounded-3xl flex justify-center gap-4 items-center text-xl cursor-pointer hover:bg-green-200 transition-all p-4  hover:text-green-500">
-                <Add sx={{ color: "green", fontSize: 40 }} />
-                <h3 className="text-center">Add an Expense</h3>
-              </div>
-            </Link>
-
-            <Link to="/viewexpenses" className="h-full w-1/3">
-              <div className="bg-white bg-opacity-5 w-full h-full rounded-3xl flex justify-center gap-4 items-center text-xl cursor-pointer hover:bg-orange-200 transition-all p-4 hover:text-orange-600">
-                <Pageview sx={{ color: "orange", fontSize: 40 }} />
-                <h3 className="text-center">View Expenses</h3>
-              </div>
-            </Link>
-
-            <Link to="/planbudgets" className="h-full w-1/3">
-              <div className="bg-white bg-opacity-5 w-full h-full rounded-3xl flex justify-center gap-4 items-center text-xl cursor-pointer hover:bg-purple-200 transition-all p-4  hover:text-purple-800">
-                <Payments sx={{ color: "purple", fontSize: 40 }} />
-                <h3 className="text-center">Plan Your Budgets</h3>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </div>
+    <div>
+      <HomeNavbar token={token} freelancerName={freelancerName} />
+      <ThemeProvider theme={theme}>
+        <Box sx={{ display: "flex", minHeight: "90vh", marginTop: "4%" }}>
+          <CategoryWiseExpenses />
+          <Box component="main" sx={{ flexGrow: 1, p: 3, fontWeight: "bold" }}>
+            <Typography variant="h6" gutterBottom sx={{ marginBottom: 5 }}>
+              <Link to="/addexpense" className="h-full w-1/3">
+                <Button>Add an expense</Button>
+              </Link>
+            </Typography>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <Card
+                  sx={{
+                    p: 2,
+                    maxHeight: "70vh",
+                    width: "50vw",
+                    overflowY: "auto",
+                    boxShadow: 3,
+                    scrollbarWidth: "none",
+                  }}
+                >
+                  {loading ? (
+                    <Typography color="textSecondary">Loading...</Typography>
+                  ) : expenses.length > 0 ? (
+                    <Box>
+                      {expenses.map((expense) => (
+                        <React.Fragment key={expense.id}>
+                          <Box sx={{ py: 2, px: 2 }}>
+                            <Typography variant="h6" color="textSecondary">
+                              {expense.expense_title}
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                width: "100%",
+                              }}
+                            >
+                              <Typography variant="h8">
+                                {expense.date}
+                              </Typography>
+                              <Typography variant="h8">
+                                {expense.category}
+                              </Typography>
+                              <Typography variant="h8">
+                                ${expense.amount}
+                              </Typography>
+                            </Box>
+                          </Box>
+                          <Divider />
+                        </React.Fragment>
+                      ))}
+                    </Box>
+                  ) : (
+                    <Typography color="textSecondary">
+                      No expenses found.
+                    </Typography>
+                  )}
+                </Card>
+              </Grid>
+            </Grid>
+          </Box>
+        </Box>
+      </ThemeProvider>
     </div>
   );
 };
