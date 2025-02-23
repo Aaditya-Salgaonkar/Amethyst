@@ -186,10 +186,10 @@ const ProjectHeader = ({ projName, budget, spent, remain, duedate }) => {
         {projName}
       </Grid2>
       <Grid2 size={2} sx={commonProjectHeaderStyle}>
-        {budget}
+        {`${budget}$`}
       </Grid2>
       <Grid2 size={2} sx={commonProjectHeaderStyle}>
-        {spent}
+        {`${spent}$`}
       </Grid2>
       <Grid2 size={2} sx={commonProjectHeaderStyle}>
         {remain}
@@ -253,18 +253,11 @@ const ProjectItems = ({ itemName = "Dummy" }) => {
   );
 };
 
-
-
-
-
-
 const fetchProjectsWithClientData = async (freelancerId) => {
   try {
     const { data: projects, error: projectError } = await supabase
       .from("projects")
-      .select(
-        " name, due_date, budget_allocated, subtasks"
-      )
+      .select(" name, due_date, budget_allocated, spent, subtasks")
       .eq("freelancerId", freelancerId);
 
     if (projectError) {
@@ -274,12 +267,14 @@ const fetchProjectsWithClientData = async (freelancerId) => {
 
     const projectsWithClientData = await Promise.all(
       projects.map(async (project) => {
-
         return {
           projectName: project.name,
           endDate: project.due_date,
           totalBudget: project.budget_allocated?.toString() || "0",
-          subtasks: project.subtasks ? JSON.parse(project.subtasks).map((task) => task.name) : [],
+          spent: project.spent || 0,
+          subtasks: project.subtasks
+            ? JSON.parse(project.subtasks).map((task) => task.name)
+            : [],
         };
       })
     );
@@ -290,10 +285,6 @@ const fetchProjectsWithClientData = async (freelancerId) => {
     return [];
   }
 };
-
-
-
-
 
 const Project = ({
   projItems = [],
@@ -327,23 +318,21 @@ const Project = ({
 };
 
 export default function Report({ uuid }) {
-
-  const [loading, setLoading] = useState(false) 
-  const [projects, setProjects] = useState([])
+  const [loading, setLoading] = useState(false);
+  const [projects, setProjects] = useState([]);
 
   const loadProjects = async () => {
     if (uuid) {
-      setLoading(true)
+      setLoading(true);
       const fetchedProjects = await fetchProjectsWithClientData(uuid);
       setProjects(fetchedProjects);
-      setLoading(false)
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     loadProjects();
   }, []);
-
 
   return (
     <ThemeProvider theme={theme}>
@@ -374,22 +363,26 @@ export default function Report({ uuid }) {
             zIndex: "1",
           }}
         ></Box>
-      
+
         <Paper sx={paperStyle} elevation={18}>
           <TopRow />
           <ListRow />
-          {loading ? <Spinner/> : projects.map((item, index) => (
-            <Project
-              key={index}
-              name={item.projectName}
-              duedate={item.endDate}
-              budget={item.totalBudget}
-              projItems={item.subtasks}
-            />
-          ))}
-        
+          {loading ? (
+            <Spinner />
+          ) : (
+            projects.map((item, index) => (
+              <Project
+                key={index}
+                name={item.projectName}
+                duedate={item.endDate}
+                budget={item.totalBudget}
+                spent={item.spent}
+                projItems={item.subtasks}
+              />
+            ))
+          )}
         </Paper>
-        
+
         <Box
           sx={{
             height: "27%",

@@ -3,6 +3,7 @@ import SideNavBar from "../components/SideNavBar";
 import { motion } from "framer-motion";
 import { supabase } from "../client";
 import { useNavigate } from "react-router-dom";
+
 const AddExpense = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -29,7 +30,7 @@ const AddExpense = () => {
 
       const { data, error } = await supabase
         .from("projects")
-        .select("p_id, name")
+        .select("p_id, name, spent")
         .eq("freelancerId", user.id);
 
       if (error) {
@@ -48,16 +49,39 @@ const AddExpense = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.projectId) {
+      alert("Please select a project.");
+      return;
+    }
+
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser();
+
     if (authError) {
       console.error("Error fetching user:", authError);
       return;
     }
 
-    const { error } = await supabase.from("expenses").insert([
+    // Fetch current spent amount for the selected project
+    const { data: projectData, error: projectError } = await supabase
+      .from("projects")
+      .select("spent")
+      .eq("p_id", formData.projectId)
+      .single();
+
+    if (projectError) {
+      console.error("Error fetching project data:", projectError);
+      return;
+    }
+
+    const currentSpent = projectData?.spent || 0;
+    const newSpent = currentSpent + parseFloat(formData.amount);
+
+    // Insert new expense into the expenses table
+    const { error: expenseError } = await supabase.from("expenses").insert([
       {
         expense_title: formData.title,
         amount: formData.amount,
@@ -68,20 +92,35 @@ const AddExpense = () => {
       },
     ]);
 
-    if (error) {
-      console.error("Error submitting expense:", error);
-    } else {
-      alert("Expense added successfully!");
-      setFormData({
-        title: "",
-        amount: "",
-        date: "",
-        category: "",
-        clientName: "",
-        projectId: "",
-      });
-      navigate(-1);
+    if (expenseError) {
+      console.error("Error submitting expense:", expenseError);
+      return;
     }
+
+    // Update the spent value in the projects table
+    const { error: updateError } = await supabase
+      .from("projects")
+      .update({ spent: newSpent })
+      .eq("p_id", formData.projectId);
+
+    if (updateError) {
+      console.error("Error updating spent amount:", updateError);
+      return;
+    }
+
+    alert("Expense added successfully!");
+
+    // Reset the form
+    setFormData({
+      title: "",
+      amount: "",
+      date: "",
+      category: "",
+      clientName: "",
+      projectId: "",
+    });
+
+    navigate(-1);
   };
 
   return (
