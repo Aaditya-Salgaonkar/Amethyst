@@ -9,8 +9,10 @@ import {
   Button,
 } from "@mui/material";
 import React from "react";
-
+import { useState, useEffect } from "react";
 import { theme } from "../components/Theme";
+import { supabase } from "../client";
+import Spinner from "../components/Spinner";
 
 function calcDays(duedate) {
   const today = new Date();
@@ -24,57 +26,82 @@ function getStatusColor(days) {
   if (days >= 4) return "rgb(255, 255, 0)";
   return "rgb(255, 0, 0)";
 }
-const fontSizes = {
-  x15: "2rem",
-  x12: "1.8rem",
-  x10: "1.6rem",
-  x76: "1.4rem",
-  x64: "1.2rem",
-  x45: "1.1rem",
-  x30: "1rem",
-  x20: "0.9rem",
+
+
+
+const fetchProjectsWithClientData = async (freelancerId) => {
+  try {
+    const { data: projects, error: projectError } = await supabase
+      .from("projects")
+      .select(
+        "name, status, due_date, client_id"
+      )
+      .eq("freelancerId", freelancerId);
+
+    if (projectError) {
+      console.error("Error fetching projects:", projectError.message);
+      return [];
+    }
+
+    const projectsWithClientData = await Promise.all(
+      projects.map(async (project) => {
+        let clientName = "";
+
+        if (project.client_id) {
+          const { data: client, error: clientError } = await supabase
+            .from("clients")
+            .select("name")
+            .eq("id", project.client_id)
+            .single();
+
+          if (clientError) {
+            console.error(
+              `Error fetching client for project ${project.p_id}:`,
+              clientError.message
+            );
+          } else {
+            clientName = client.name;
+          }
+        }
+
+        return {
+          projectName: project.name,
+          endDate: project.due_date,
+          clientName: clientName || "Unknown",
+          status: project.status,
+        };
+      })
+    );
+
+    return projectsWithClientData;
+  } catch (error) {
+    console.error("Unexpected error:", error.message);
+    return [];
+  }
 };
 
-const demoObj = [
-  {
-    name: "Project 1",
-    duedate: "03/7/2025",
-    status: "Pending",
-    client: "John Doe",
-  },
-  {
-    name: "Project 2",
-    duedate: "12/15/2024",
-    status: "Pending",
-    client: "John Gullingham",
-  },
-  {
-    name: "Project 3",
-    duedate: "12/18/2024",
-    status: "Completed",
-    client: "Sommers Doe",
-  },
-  {
-    name: "Project 4",
-    duedate: "02/27/2025",
-    status: "Pending",
-    client: "Anna Smith",
-  },
-  {
-    name: "Project 5",
-    duedate: "12/25/2024",
-    status: "Pending",
-    client: "Mike Johnson",
-  },
-  {
-    name: "Project 5",
-    duedate: "12/25/2024",
-    status: "Pending",
-    client: "Mike Johnson",
-  },
-];
 
-export default function Reminder() {
+
+
+
+export default function Reminder({uuid}) {
+
+  const [loading, setLoading] = useState(false)
+  const [projects, setProjects] = useState([])
+
+  const loadProjects = async () => {
+    if (uuid) {
+      setLoading(true)
+      const fetchedProjects = await fetchProjectsWithClientData(uuid);
+      setProjects(fetchedProjects);
+      setLoading(false)
+    }
+  };
+
+  useEffect(() => {
+      loadProjects();
+    }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <Box
@@ -134,8 +161,8 @@ export default function Reminder() {
             },
           }}
         >
-          {demoObj.map((project, index) => {
-            const daysRemaining = calcDays(project.duedate);
+          {loading ? <Spinner top="27%"/> : projects.map((project, index) => {
+            const daysRemaining = calcDays(project.endDate);
             return (
               <Box
                 key={index}
@@ -177,11 +204,11 @@ export default function Reminder() {
                       }}
                     >
                       <Typography fontWeight={"bold"} variant="h6">
-                        {project.name}
+                        {project.projectName}
                       </Typography>
 
                       <Typography mb={1} fontWeight={"bold"}>
-                        {project.client}
+                        {project.clientName}
                       </Typography>
 
                       <Typography fontWeight={500}>
@@ -219,7 +246,7 @@ export default function Reminder() {
                       }}
                     >
                       <Typography fontWeight="bold" color="rgb(163, 163, 163)">
-                        {project.duedate}
+                        {project.endDate}
                       </Typography>
                       <Chip
                         size="small"
@@ -233,7 +260,7 @@ export default function Reminder() {
                           fontWeight: "bold",
                           backgroundColor: getStatusColor(daysRemaining),
                         }}
-                        label={project.status}
+                        label={project.status === true ? "COMPLETED": "PENDING"}
                       />
                     </Stack>
                   </Grid2>

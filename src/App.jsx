@@ -36,7 +36,7 @@ const App = () => {
           element={<LandingPage />}
         />
         <Route path="/signup" element={<SignUp />} />
-        <Route path="/expenses" element={<ExpensesDashboard />} />
+        <Route path="/expenses" element={<ExpensesDashboard token={token} />} />
         <Route path="/addexpense" element={<AddExpense />} />
         <Route path="/payments" element={<Payments token={token} />} />
         <Route path="/login" element={<Login setToken={setToken} />} />

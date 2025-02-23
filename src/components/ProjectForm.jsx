@@ -12,7 +12,9 @@ import {
 import { Add, Remove } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../client";
-const commonGridItemStyles = {
+
+
+export const commonGridItemStyles = {
   display: "flex",
   flexDirection: "column",
   padding: 3,
